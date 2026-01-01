@@ -1,0 +1,928 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Stock Véhicule</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="./manifest.webmanifest">
+  <meta name="theme-color" content="#05070b" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <style>
+    :root{
+      --bg0:#030409;
+      --bg1:#05070b;
+      --bg2:#070a10;
+      --card:rgba(255,255,255,.05);
+      --card2:rgba(255,255,255,.075);
+      --stroke:rgba(255,255,255,.09);
+      --txt:#ecf3ff;
+      --mut:#9fb0c8;
+
+      --accent:#39d98a;
+      --accent2:#47c9ff;
+      --warn:#ffb020;
+      --bad:#ff4d6d;
+
+      --shadow: 0 26px 80px rgba(0,0,0,.70);
+      --shadow2: 0 14px 40px rgba(0,0,0,.55);
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color:var(--txt);
+      background:
+        radial-gradient(1000px 700px at 18% 10%, rgba(71,201,255,.10), transparent 60%),
+        radial-gradient(900px 700px at 82% 18%, rgba(57,217,138,.08), transparent 60%),
+        radial-gradient(1200px 900px at 50% 120%, rgba(57,217,138,.06), transparent 60%),
+        linear-gradient(180deg, var(--bg0), var(--bg1) 40%, var(--bg2));
+      overflow-x:hidden;
+    }
+
+    .wrap{max-width:1100px;margin:0 auto;padding:10px 14px 0}
+    .header{
+      position: sticky;
+      top: 0;
+      z-index: 60;
+      padding-top: env(safe-area-inset-top);
+      background: linear-gradient(180deg, rgba(3,4,9,.96), rgba(3,4,9,.80) 65%, rgba(3,4,9,0));
+      backdrop-filter: blur(10px);
+    }
+    .headerInner{
+      display:flex; gap:12px; align-items:center; justify-content:space-between;
+      padding: 10px 0 14px;
+    }
+    .brand{display:flex; gap:12px; align-items:center;}
+    .logo{
+      width:44px;height:44px;border-radius:14px;
+      background:
+        radial-gradient(18px 18px at 30% 30%, rgba(71,201,255,.28), transparent 55%),
+        radial-gradient(18px 18px at 70% 70%, rgba(57,217,138,.26), transparent 55%),
+        linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04));
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow: var(--shadow2);
+      position:relative; overflow:hidden;
+    }
+    .logo:after{
+      content:"";
+      position:absolute; inset:-40%;
+      background: conic-gradient(from 0deg, rgba(71,201,255,0), rgba(71,201,255,.35), rgba(57,217,138,.35), rgba(71,201,255,0));
+      animation: spin 7s linear infinite;
+      filter: blur(12px);
+      opacity:.65;
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    .titleBox{line-height:1.1}
+    .title{font-size:16px;font-weight:950;letter-spacing:.3px}
+    .subtitle{margin-top:4px;font-size:12px;color:var(--mut);letter-spacing:.2px}
+
+    .actions{display:flex; gap:10px; align-items:center}
+    .chip{
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 9px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.045);
+      border:1px solid rgba(255,255,255,.08);
+      color: var(--mut);
+      font-size:12px;
+      white-space:nowrap;
+    }
+    .dot{
+      width:8px;height:8px;border-radius:50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 6px rgba(57,217,138,.09);
+    }
+    .btn{
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.05);
+      color:var(--txt);
+      padding: 10px 12px;
+      border-radius: 14px;
+      font-weight: 900;
+      font-size: 13px;
+      display:inline-flex; align-items:center; gap:10px;
+      cursor:pointer;
+      box-shadow: 0 10px 26px rgba(0,0,0,.40);
+      user-select:none;
+      transition: transform .08s ease, filter .15s ease;
+    }
+    .btn:hover{filter:brightness(1.07)}
+    .btn:active{transform:translateY(1px)}
+    .btn.primary{
+      border-color: rgba(57,217,138,.22);
+      background: linear-gradient(180deg, rgba(57,217,138,.16), rgba(255,255,255,.05));
+    }
+    .icon{width:18px;height:18px;display:inline-block}
+
+    .toolbar{
+      margin-top: 10px;
+      display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+    }
+    .search{
+      flex: 1 1 220px;
+      display:flex; align-items:center; gap:10px;
+      padding: 12px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.045);
+      box-shadow: var(--shadow2);
+    }
+    .search input{
+      flex:1;
+      background: transparent;
+      border:0; outline:none;
+      color: var(--txt);
+      font-size: 14px;
+      font-weight: 850;
+    }
+    .search input::placeholder{color: rgba(159,176,200,.65); font-weight:800}
+
+    .seg{
+      display:flex; gap:8px; align-items:center;
+      padding: 6px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.045);
+      box-shadow: var(--shadow2);
+    }
+    .seg button{
+      border:0; background: transparent;
+      color: var(--mut);
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-weight: 950;
+      font-size: 13px;
+      cursor:pointer;
+    }
+    .seg button.active{
+      background: rgba(255,255,255,.08);
+      color: var(--txt);
+      border: 1px solid rgba(255,255,255,.10);
+    }
+
+    .statsRow{
+      margin-top: 12px;
+      display:grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap:10px;
+    }
+    @media (max-width: 720px){ .statsRow{grid-template-columns: 1fr 1fr} }
+    .stat{
+      padding: 14px 14px;
+      border-radius: 18px;
+      border:1px solid rgba(255,255,255,.10);
+      background: linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.035));
+      box-shadow: var(--shadow2);
+      position:relative;
+      overflow:hidden;
+    }
+    .stat:before{
+      content:"";
+      position:absolute; inset:-60%;
+      background: radial-gradient(circle, rgba(71,201,255,.18), transparent 60%);
+      opacity:.25;
+      transform: translate(18%, -12%);
+    }
+    .stat b{display:block;font-size:18px;letter-spacing:.2px;position:relative}
+    .stat span{display:block;margin-top:6px;color:var(--mut);font-size:12px;font-weight:800;position:relative}
+
+    .grid{
+      margin-top: 14px;
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      padding-bottom: 96px;
+    }
+    @media (max-width: 1050px){ .grid{grid-template-columns: repeat(3, 1fr);} }
+    @media (max-width: 820px){ .grid{grid-template-columns: repeat(2, 1fr);} }
+
+    .card{
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.03));
+      box-shadow: var(--shadow2);
+      overflow:hidden;
+      position:relative;
+      cursor:pointer;
+      transition: transform .12s ease, filter .2s ease;
+      user-select:none;
+    }
+    .card:hover{filter:brightness(1.06)}
+    .card:active{transform:translateY(1px)}
+
+    .cardTop{
+      padding: 14px 14px 10px;
+      min-height: 140px;
+      display:flex; align-items:center; justify-content:center;
+      background:
+        radial-gradient(220px 140px at 50% 50%, rgba(71,201,255,.085), transparent 60%),
+        radial-gradient(220px 140px at 70% 30%, rgba(57,217,138,.08), transparent 60%);
+      position:relative;
+    }
+
+    .bottle{
+      width: 92px;
+      height: 120px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.04));
+      box-shadow: 0 18px 55px rgba(0,0,0,.50);
+      display:flex; align-items:center; justify-content:center;
+      position:relative; overflow:hidden;
+      font-weight: 1000;
+      letter-spacing: .6px;
+    }
+    .bottle:after{
+      content:"";
+      position:absolute; inset:-40%;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.25), transparent 42%);
+      transform: rotate(20deg);
+      opacity:.55;
+      pointer-events:none;
+    }
+    .bottle span{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:12px; color: rgba(236,243,255,.80); z-index:1}
+    .bottle img{
+      position:absolute;
+      inset: 8px 8px 8px 8px;
+      width: calc(100% - 16px);
+      height: calc(100% - 16px);
+      object-fit: contain;
+      z-index:2;
+      filter: drop-shadow(0 14px 22px rgba(0,0,0,.35));
+    }
+
+    .badgeQty{
+      position:absolute;
+      top: 10px; right: 10px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      font-weight: 1000;
+      font-size: 12px;
+      color: #06110c;
+      background: linear-gradient(180deg, rgba(57,217,138,.95), rgba(57,217,138,.65));
+      box-shadow: 0 16px 45px rgba(57,217,138,.18);
+      border: 1px solid rgba(255,255,255,.18);
+      min-width: 44px;
+      text-align:center;
+      z-index:3;
+    }
+    .badgeLow{
+      background: linear-gradient(180deg, rgba(255,176,32,.95), rgba(255,176,32,.65));
+      box-shadow: 0 16px 45px rgba(255,176,32,.18);
+    }
+    .badgeZero{
+      background: linear-gradient(180deg, rgba(255,77,109,.95), rgba(255,77,109,.60));
+      box-shadow: 0 16px 45px rgba(255,77,109,.18);
+      color:#12030a;
+    }
+
+    .cardBody{padding: 12px 14px 14px}
+    .name{font-weight: 1000;font-size: 13px;line-height: 1.2;letter-spacing: .2px;margin: 0 0 8px;}
+    .metaRow{display:flex; align-items:center; justify-content:space-between; gap:10px; color: var(--mut); font-size: 12px; font-weight: 850;}
+    .tag{padding: 7px 9px;border-radius: 999px;border:1px solid rgba(255,255,255,.10);background: rgba(255,255,255,.045);color: rgba(159,176,200,.9);font-size: 11px;font-weight: 950;white-space:nowrap;}
+
+    /* Sheet + Scanner + Toast identical to previous build (kept) */
+    .sheetBackdrop{position:fixed; inset:0;background: rgba(0,0,0,.68);backdrop-filter: blur(10px);opacity:0;pointer-events:none;transition: opacity .18s ease;z-index: 90;}
+    .sheetBackdrop.show{opacity:1; pointer-events:auto;}
+    .sheet{position:fixed; left:0; right:0; bottom: -430px; transition: transform .22s ease; z-index: 95; padding: 0 12px calc(env(safe-area-inset-bottom) + 12px);}
+    .sheet.show{transform: translateY(-430px);}
+    .sheetInner{max-width: 720px;margin: 0 auto;border-radius: 26px;border:1px solid rgba(255,255,255,.12);background: linear-gradient(180deg, rgba(9,12,18,.94), rgba(6,8,12,.94));box-shadow: var(--shadow);overflow:hidden;}
+    .sheetHandle{width: 60px; height: 5px;border-radius:999px;background: rgba(255,255,255,.18);margin: 10px auto 8px;}
+    .sheetContent{padding: 10px 14px 14px}
+    .sheetTitleRow{display:flex; align-items:flex-start; justify-content:space-between; gap:10px; padding: 4px 2px 10px;}
+    .sheetTitle{font-weight:1000;font-size:16px;letter-spacing:.2px;margin:0}
+    .sheetSub{margin-top:6px;color:var(--mut);font-size:12px;font-weight:850}
+    .qtyBig{font-size: 28px;font-weight: 1100;letter-spacing:.5px;padding: 10px 14px;border-radius: 18px;border:1px solid rgba(255,255,255,.12);background: rgba(255,255,255,.05);min-width: 88px;text-align:center;}
+    .controls{display:grid;grid-template-columns: 1fr 1fr;gap: 10px;margin-top: 10px;}
+    .ctl{padding: 14px 14px;border-radius: 18px;border:1px solid rgba(255,255,255,.12);background: rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;gap:10px;font-weight: 1000;cursor:pointer;user-select:none;}
+    .ctl.plus{border-color: rgba(57,217,138,.22);background: linear-gradient(180deg, rgba(57,217,138,.18), rgba(255,255,255,.05));}
+    .ctl.minus{border-color: rgba(255,77,109,.18);background: linear-gradient(180deg, rgba(255,77,109,.14), rgba(255,255,255,.05));}
+    .ctl:active{transform:translateY(1px)}
+    .rowChips{margin-top:10px;display:flex;gap:10px;flex-wrap:wrap}
+
+    .fab{position: fixed;right: 16px;bottom: calc(env(safe-area-inset-bottom) + 16px);z-index: 80;width: 62px; height: 62px;border-radius: 22px;border: 1px solid rgba(255,255,255,.14);background:
+        radial-gradient(30px 30px at 30% 30%, rgba(71,201,255,.30), transparent 60%),
+        radial-gradient(30px 30px at 70% 70%, rgba(57,217,138,.30), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.05));
+      box-shadow: 0 20px 65px rgba(0,0,0,.60);display:flex; align-items:center; justify-content:center;cursor:pointer; user-select:none; overflow:hidden;}
+    .fab:after{content:"";position:absolute; inset:-60%;background: conic-gradient(from 0deg, rgba(71,201,255,0), rgba(71,201,255,.40), rgba(57,217,138,.40), rgba(71,201,255,0));filter: blur(14px);opacity:.50;animation: spin 7s linear infinite;}
+    .fab svg{position:relative}
+
+    .modal{position:fixed; inset:0;background: rgba(0,0,0,.72);backdrop-filter: blur(10px);z-index: 110;opacity:0; pointer-events:none;transition: opacity .18s ease;display:flex; align-items:flex-end;padding: 12px;padding-bottom: calc(env(safe-area-inset-bottom) + 12px);}
+    .modal.show{opacity:1; pointer-events:auto;}
+    .modalCard{width:100%;max-width: 720px;margin: 0 auto;border-radius: 26px;border:1px solid rgba(255,255,255,.12);background: linear-gradient(180deg, rgba(9,12,18,.95), rgba(6,8,12,.95));box-shadow: var(--shadow);overflow:hidden;}
+    .modalTop{padding: 12px 14px;display:flex; align-items:center; justify-content:space-between; gap:10px;border-bottom: 1px solid rgba(255,255,255,.10);}
+    .modalTop b{font-weight:1000; letter-spacing:.2px}
+    .modalTop .right{display:flex; gap:10px; align-items:center}
+    .miniBtn{border:1px solid rgba(255,255,255,.12);background: rgba(255,255,255,.05);color: var(--txt);padding: 10px 12px;border-radius: 14px;font-weight: 950;font-size: 13px;cursor:pointer;user-select:none;}
+    .miniBtn:active{transform:translateY(1px)}
+    .miniBtn.primary{border-color: rgba(71,201,255,.22);background: linear-gradient(180deg, rgba(71,201,255,.16), rgba(255,255,255,.05));}
+    .videoBox{position:relative;background: #000;aspect-ratio: 16 / 9;width: 100%;overflow:hidden;}
+    video{width:100%; height:100%; object-fit:cover; display:block}
+    .scanOverlay{position:absolute; inset:0;display:flex; align-items:center; justify-content:center;pointer-events:none;}
+    .scanFrame{width: 70%;max-width: 420px;aspect-ratio: 1.9 / 1;border-radius: 20px;border: 2px solid rgba(71,201,255,.55);box-shadow: 0 0 0 10px rgba(71,201,255,.10), 0 0 40px rgba(71,201,255,.20);position:relative;}
+    .scanFrame:after{content:"";position:absolute; left:10px; right:10px; top:50%;height:2px;background: rgba(57,217,138,.75);box-shadow: 0 0 18px rgba(57,217,138,.35);transform: translateY(-50%);opacity:.9;}
+    .modalBody{padding: 12px 14px}
+    .scanResult{display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap;padding: 12px;border-radius: 18px;border:1px solid rgba(255,255,255,.10);background: rgba(255,255,255,.04);}
+    .scanResult .left{display:flex; flex-direction:column; gap:6px}
+    .scanResult .small{color:var(--mut); font-size:12px; font-weight:850}
+    .scanResult .big{font-weight:1000}
+    .confirmRow{margin-top: 10px;display:grid;grid-template-columns: 1fr 1fr;gap: 10px;}
+    .confirmRow button{width:100%;padding: 14px 14px;border-radius: 18px;border:1px solid rgba(255,255,255,.12);background: rgba(255,255,255,.05);color:var(--txt);font-weight:1000;cursor:pointer;user-select:none;}
+    .confirmRow button.ok{border-color: rgba(57,217,138,.22);background: linear-gradient(180deg, rgba(57,217,138,.18), rgba(255,255,255,.05));}
+    .confirmRow button.no{border-color: rgba(255,77,109,.18);background: linear-gradient(180deg, rgba(255,77,109,.14), rgba(255,255,255,.05));}
+    .confirmRow button:active{transform:translateY(1px)}
+
+    .toast{position: fixed;left: 50%;bottom: calc(env(safe-area-inset-bottom) + 92px);transform: translateX(-50%);padding: 10px 12px;border-radius: 999px;border:1px solid rgba(255,255,255,.12);background: rgba(6,8,12,.84);box-shadow: var(--shadow2);color: var(--mut);font-size: 12px;font-weight: 900;opacity: 0;pointer-events:none;transition: opacity .18s ease, transform .18s ease;z-index: 140;backdrop-filter: blur(10px);white-space:nowrap;}
+    .toast.show{opacity:1; transform: translateX(-50%) translateY(-4px);}
+  </style>
+</head>
+
+<body>
+  <div class="header">
+    <div class="wrap">
+      <div class="headerInner">
+        <div class="brand">
+          <div class="logo" aria-hidden="true"></div>
+          <div class="titleBox">
+            <div class="title">Stock Véhicule</div>
+            <div class="subtitle">Temps réel • Tap sur une bouteille pour ajuster (+/–)</div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <div class="chip"><span class="dot"></span><span id="chipStatus">Offline</span></div>
+          <button class="btn primary" type="button" id="btnExport">
+            <svg class="icon" viewBox="0 0 24 24" fill="none">
+              <path d="M12 3v10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M8 7l4-4 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M5 14v5h14v-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            Export
+          </button>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <div class="search">
+          <svg class="icon" viewBox="0 0 24 24" fill="none">
+            <path d="M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z" stroke="currentColor" stroke-width="2"/>
+            <path d="M16.3 16.3 21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <input id="q" type="text" placeholder="Rechercher une bouteille…" />
+        </div>
+
+        <div class="seg" role="tablist" aria-label="Filtres">
+          <button id="fAll" class="active" type="button">Tout</button>
+          <button id="fLow" type="button">Faible</button>
+          <button id="fZero" type="button">Rupture</button>
+        </div>
+
+        <button class="btn" type="button" id="btnImport">
+          <svg class="icon" viewBox="0 0 24 24" fill="none">
+            <path d="M12 21V11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <path d="M8 15l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M5 10V5h14v5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          Import
+        </button>
+
+        <button class="btn" type="button" id="btnReset">
+          <svg class="icon" viewBox="0 0 24 24" fill="none">
+            <path d="M21 12a9 9 0 1 1-3-6.7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <path d="M21 3v6h-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          Reset
+        </button>
+      </div>
+
+      <div class="statsRow">
+        <div class="stat">
+          <b id="sTotal">—</b><span>Produits suivis</span>
+        </div>
+        <div class="stat">
+          <b id="sUnits">—</b><span>Unités totales</span>
+        </div>
+        <div class="stat">
+          <b id="sLow">—</b><span>Faible / Rupture</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <!-- FAB Scanner -->
+  <div class="fab" id="fabScan" title="Scanner EAN">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+      <path d="M7 7h3M7 7V4h3M17 7h-3M17 7V4h-3M7 17h3M7 17v3h3M17 17h-3M17 17v3h-3" stroke="white" stroke-width="2" stroke-linecap="round"/>
+      <path d="M8 12h8" stroke="white" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+  </div>
+
+  <!-- Bottom sheet -->
+  <div class="sheetBackdrop" id="backdrop"></div>
+  <div class="sheet" id="sheet">
+    <div class="sheetInner">
+      <div class="sheetHandle"></div>
+      <div class="sheetContent">
+        <div class="sheetTitleRow">
+          <div>
+            <h3 class="sheetTitle" id="sheetName">—</h3>
+            <div class="sheetSub" id="sheetSub">Ajuster le stock</div>
+          </div>
+          <div class="qtyBig" id="sheetQty">0</div>
+        </div>
+
+        <div class="controls">
+          <div class="ctl minus" id="btnMinus">— 1</div>
+          <div class="ctl plus" id="btnPlus">+ 1</div>
+        </div>
+
+        <div class="rowChips">
+          <div class="chip"><span class="dot" style="background:var(--accent2)"></span><span>Tap carte = ouvrir</span></div>
+          <div class="chip"><span class="dot" style="background:var(--warn)"></span><span>Faible ≤ 2</span></div>
+          <div class="chip"><span class="dot" style="background:var(--bad)"></span><span>Rupture = 0</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scanner modal -->
+  <div class="modal" id="scanModal" aria-hidden="true">
+    <div class="modalCard">
+      <div class="modalTop">
+        <b>Scanner une bouteille</b>
+        <div class="right">
+          <button class="miniBtn" id="btnTorch" type="button">Flash</button>
+          <button class="miniBtn primary" id="btnCloseScan" type="button">Fermer</button>
+        </div>
+      </div>
+
+      <div class="videoBox">
+        <video id="video" playsinline></video>
+        <div class="scanOverlay">
+          <div class="scanFrame"></div>
+        </div>
+      </div>
+
+      <div class="modalBody">
+        <div class="scanResult">
+          <div class="left">
+            <div class="small">EAN détecté</div>
+            <div class="big" id="eanText">—</div>
+            <div class="small" id="matchText">Présente la bouteille dans le cadre</div>
+          </div>
+          <div class="badgeQty" id="scanBadge">x0</div>
+        </div>
+
+        <div class="confirmRow">
+          <button class="no" id="btnCancelDeduct" type="button">Annuler</button>
+          <button class="ok" id="btnConfirmDeduct" type="button">Confirmer : -1</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">—</div>
+
+<script>
+"use strict";
+
+/* PWA register + status chip */
+const chipStatus = document.getElementById("chipStatus");
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", async () => {
+    try {
+      await navigator.serviceWorker.register("./sw.js");
+      chipStatus.textContent = navigator.onLine ? "Online" : "Offline";
+    } catch(e) {
+      chipStatus.textContent = "Offline";
+    }
+  });
+}
+window.addEventListener("online", ()=> chipStatus.textContent = "Online");
+window.addEventListener("offline", ()=> chipStatus.textContent = "Offline");
+
+/* Data */
+const LOW_THRESHOLD = 2;
+const LS_KEY = "stock_vehicle_v1";
+
+const PRODUCTS = [
+      { id:"tequila_sanjose", name:"Tequila San José", barcode:"" },
+      { id:"gibsons_gin", name:"Gibson’s Gin", barcode:"" },
+      { id:"jagermeister", name:"Jägermeister", barcode:"" },
+      { id:"perrier", name:"Perrier", barcode:"" },
+      { id:"pastis_51", name:"Pastis 51", barcode:"3047100000247" },
+      { id:"ricard", name:"Ricard", barcode:"" },
+      { id:"havana_3ans", name:"Havana Club 3 ans", barcode:"" },
+      { id:"get_27", name:"GET 27", barcode:"7610113009214" },
+      { id:"gordons_gin", name:"Gordon’s Gin", barcode:"5000289925440" },
+      { id:"liqueur_cassis", name:"Liqueur de cassis", barcode:"" },
+      { id:"jack_old7", name:"Jack Daniel’s Old No.7", barcode:"3099873045864" },
+      { id:"jack_honey", name:"Jack Daniel’s Tennessee Honey", barcode:"5099873001370" },
+      { id:"old_nick_darkwood", name:"Old Nick Dark Wood", barcode:"" },
+      { id:"captain_morgan", name:"Captain Morgan Spiced Gold", barcode:"5000281015249" },
+      { id:"saint_james_blanc", name:"Saint James Rhum Blanc", barcode:"" },
+      { id:"trois_rivieres", name:"Trois Rivières Rhum Blanc", barcode:"" },
+      { id:"havana_especial", name:"Havana Club Especial", barcode:"" },
+      { id:"old_nick_blanc", name:"Old Nick Rhum Blanc", barcode:"" },
+      { id:"clan_campbell", name:"Clan Campbell", barcode:"" },
+      { id:"ballantines", name:"Ballantine’s Finest", barcode:"" },
+      { id:"poliakov", name:"Poliakov Vodka", barcode:"3147690130223" },
+      { id:"absolut", name:"Absolut Vodka", barcode:"7312040017067" },
+      { id:"ciroc_pomme", name:"Cîroc Pomme", barcode:"" },
+      { id:"ciroc_classic", name:"Cîroc Classic", barcode:"" },
+      { id:"ciroc_redberry", name:"Cîroc Red Berry", barcode:"" },
+      { id:"william_peel", name:"William Peel", barcode:"5010327000148" },
+      { id:"label_5", name:"Label 5 Classic Black", barcode:"3147690128573" },
+      { id:"vin_rouge", name:"Vin rouge", barcode:"" },
+      { id:"vin_blanc", name:"Vin blanc", barcode:"" },
+      { id:"vin_rose", name:"Vin rosé", barcode:"" },
+      { id:"muscat", name:"Muscat", barcode:"" }
+];
+
+function seededStock(){
+  const qtys = [
+    2,2,1,0,  2,0,  3,3,3,1,  3,2,  1,3,  2,1,  2,1,  3,3,  4,4,  1,2,2,  3,3,  2,2,1,0
+  ];
+  const s = {};
+  PRODUCTS.forEach((p, i)=> s[p.id] = qtys[i] ?? 0);
+  return s;
+}
+
+const state = {
+  filter: "all",
+  q: "",
+  selectedId: null,
+  stock: {},
+  lastScan: { ean:"", matchId:null }
+};
+
+function load(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if(!raw) throw new Error("no");
+    const data = JSON.parse(raw);
+    if(!data || typeof data !== "object") throw new Error("bad");
+    if(!data.stock || typeof data.stock !== "object") throw new Error("bad2");
+    state.stock = data.stock;
+  }catch(e){
+    state.stock = seededStock();
+    save();
+  }
+}
+function save(){
+  localStorage.setItem(LS_KEY, JSON.stringify({
+    v: 1,
+    savedAt: Date.now(),
+    stock: state.stock
+  }));
+}
+
+const grid = document.getElementById("grid");
+const q = document.getElementById("q");
+const fAll = document.getElementById("fAll");
+const fLow = document.getElementById("fLow");
+const fZero = document.getElementById("fZero");
+
+const sTotal = document.getElementById("sTotal");
+const sUnits = document.getElementById("sUnits");
+const sLow = document.getElementById("sLow");
+
+const backdrop = document.getElementById("backdrop");
+const sheet = document.getElementById("sheet");
+const sheetName = document.getElementById("sheetName");
+const sheetQty = document.getElementById("sheetQty");
+const btnMinus = document.getElementById("btnMinus");
+const btnPlus = document.getElementById("btnPlus");
+
+const toast = document.getElementById("toast");
+function toastMsg(text){
+  toast.textContent = text;
+  toast.classList.add("show");
+  clearTimeout(toast._t);
+  toast._t = setTimeout(()=>toast.classList.remove("show"), 1400);
+}
+
+function normalizeName(s){ return (s||"").toLowerCase().trim(); }
+
+function qtyClass(qty){
+  if(qty <= 0) return "badgeZero";
+  if(qty <= LOW_THRESHOLD) return "badgeLow";
+  return "";
+}
+function bottleMonogram(name){
+  const parts = name.replace("’","'").split(" ").filter(Boolean);
+  const a = parts[0]?.[0] || "A";
+  const b = parts[1]?.[0] || parts[0]?.[1] || "N";
+  return (a + b).toUpperCase();
+}
+
+function computeStats(){
+  const total = PRODUCTS.length;
+  let units = 0;
+  let lowOrZero = 0;
+  for(const p of PRODUCTS){
+    const v = Number(state.stock[p.id] ?? 0);
+    units += v;
+    if(v === 0 || v <= LOW_THRESHOLD) lowOrZero++;
+  }
+  sTotal.textContent = total;
+  sUnits.textContent = units;
+  sLow.textContent = lowOrZero;
+}
+
+function filteredProducts(){
+  const qq = normalizeName(state.q);
+  return PRODUCTS.filter(p => {
+    const v = Number(state.stock[p.id] ?? 0);
+    if(state.filter === "low" && !(v > 0 && v <= LOW_THRESHOLD)) return false;
+    if(state.filter === "zero" && v !== 0) return false;
+    if(qq && !normalizeName(p.name).includes(qq)) return false;
+    return true;
+  });
+}
+
+function render(){
+  computeStats();
+  const list = filteredProducts();
+
+  grid.innerHTML = list.map(p => {
+    const qty = Number(state.stock[p.id] ?? 0);
+    const cls = qtyClass(qty);
+    const tag = qty === 0 ? "Rupture" : (qty <= LOW_THRESHOLD ? "Faible" : "OK");
+    const imgSrc = `images/${p.id}.png`;
+    return `
+      <div class="card" data-id="${p.id}" role="button" aria-label="${p.name}">
+        <div class="cardTop">
+          <div class="badgeQty ${cls}">x${qty}</div>
+          <div class="bottle" aria-hidden="true">
+            <span>${bottleMonogram(p.name)}</span>
+            <img src="${imgSrc}" alt="" loading="lazy" />
+          </div>
+        </div>
+        <div class="cardBody">
+          <div class="name">${p.name}</div>
+          <div class="metaRow">
+            <span>${tag}</span>
+            <span class="tag">Tap = + / –</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  grid.querySelectorAll(".card").forEach(el => {
+    el.addEventListener("click", () => openSheet(el.dataset.id));
+  });
+}
+
+function openSheet(id){
+  state.selectedId = id;
+  const p = PRODUCTS.find(x=>x.id===id);
+  if(!p) return;
+
+  const qty = Number(state.stock[id] ?? 0);
+  sheetName.textContent = p.name;
+  sheetQty.textContent = qty;
+
+  backdrop.classList.add("show");
+  sheet.classList.add("show");
+}
+function closeSheet(){
+  backdrop.classList.remove("show");
+  sheet.classList.remove("show");
+  state.selectedId = null;
+}
+function adjust(delta){
+  if(!state.selectedId) return;
+  const id = state.selectedId;
+  const v = Number(state.stock[id] ?? 0);
+  const nv = Math.max(0, v + delta);
+  state.stock[id] = nv;
+  sheetQty.textContent = nv;
+  save();
+  render();
+  toastMsg(delta>0 ? "+1 ajouté" : "-1 retiré");
+}
+
+function setFilter(f){
+  state.filter = f;
+  fAll.classList.toggle("active", f==="all");
+  fLow.classList.toggle("active", f==="low");
+  fZero.classList.toggle("active", f==="zero");
+  render();
+}
+
+document.getElementById("btnExport").addEventListener("click", async ()=>{
+  const payload = {
+    v: 1,
+    exportedAt: new Date().toISOString(),
+    products: PRODUCTS,
+    stock: state.stock
+  };
+  const text = JSON.stringify(payload, null, 2);
+  try{
+    await navigator.clipboard.writeText(text);
+    toastMsg("Export copié ✅");
+  }catch(e){
+    prompt("Copie manuelle :", text);
+  }
+});
+
+document.getElementById("btnImport").addEventListener("click", ()=>{
+  const raw = prompt("Colle ici l'export JSON :");
+  if(!raw) return;
+  try{
+    const data = JSON.parse(raw);
+    if(!data || typeof data.stock !== "object") throw new Error("bad");
+    for(const p of PRODUCTS){
+      const v = Number(data.stock[p.id]);
+      if(Number.isFinite(v) && v >= 0) state.stock[p.id] = Math.floor(v);
+    }
+    save();
+    render();
+    toastMsg("Import OK ✅");
+  }catch(e){
+    alert("Import invalide ❌");
+  }
+});
+
+document.getElementById("btnReset").addEventListener("click", ()=>{
+  if(!confirm("Reset le stock (retour au seed) ?")) return;
+  state.stock = seededStock();
+  save();
+  state.q = "";
+  q.value = "";
+  setFilter("all");
+  toastMsg("Reset ✅");
+});
+
+backdrop.addEventListener("click", closeSheet);
+btnMinus.addEventListener("click", ()=>adjust(-1));
+btnPlus.addEventListener("click", ()=>adjust(+1));
+fAll.addEventListener("click", ()=>setFilter("all"));
+fLow.addEventListener("click", ()=>setFilter("low"));
+fZero.addEventListener("click", ()=>setFilter("zero"));
+q.addEventListener("input", ()=>{ state.q = q.value || ""; render(); });
+
+/* Scanner */
+const fabScan = document.getElementById("fabScan");
+const scanModal = document.getElementById("scanModal");
+const btnCloseScan = document.getElementById("btnCloseScan");
+const btnTorch = document.getElementById("btnTorch");
+const btnCancelDeduct = document.getElementById("btnCancelDeduct");
+const btnConfirmDeduct = document.getElementById("btnConfirmDeduct");
+const eanText = document.getElementById("eanText");
+const matchText = document.getElementById("matchText");
+const scanBadge = document.getElementById("scanBadge");
+const video = document.getElementById("video");
+
+let stream = null;
+let detector = null;
+let scanTimer = null;
+let torchOn = false;
+let trackForTorch = null;
+
+function findProductByEAN(ean){
+  ean = String(ean||"").trim();
+  if(!ean) return null;
+  return PRODUCTS.find(p => p.barcode && String(p.barcode).trim() === ean) || null;
+}
+
+async function openScanner(){
+  scanModal.classList.add("show");
+  scanModal.setAttribute("aria-hidden","false");
+  eanText.textContent = "—";
+  matchText.textContent = "Présente la bouteille dans le cadre";
+  scanBadge.textContent = "x0";
+  state.lastScan = { ean:"", matchId:null };
+  btnConfirmDeduct.disabled = true;
+
+  try{
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: "environment" },
+      audio: false
+    });
+    video.srcObject = stream;
+    await video.play();
+
+    trackForTorch = stream.getVideoTracks()[0] || null;
+
+    if ("BarcodeDetector" in window) {
+      detector = new BarcodeDetector({ formats: ["ean_13","ean_8","upc_a","upc_e","code_128","code_39","qr_code"] });
+      startScanLoop();
+      toastMsg("Scanner prêt ✅");
+    } else {
+      matchText.textContent = "BarcodeDetector non supporté";
+      toastMsg("Scanner non supporté ❌");
+    }
+  }catch(e){
+    matchText.textContent = "Accès caméra refusé / indisponible";
+    toastMsg("Caméra impossible ❌");
+  }
+}
+
+function closeScanner(){
+  scanModal.classList.remove("show");
+  scanModal.setAttribute("aria-hidden","true");
+  stopScanLoop();
+  stopCamera();
+}
+
+function stopCamera(){
+  try{ if(stream) stream.getTracks().forEach(t=>t.stop()); }catch(e){}
+  stream = null;
+  detector = null;
+  trackForTorch = null;
+  torchOn = false;
+}
+
+function startScanLoop(){ stopScanLoop(); scanTimer = setInterval(scanOnce, 250); }
+function stopScanLoop(){ if(scanTimer) clearInterval(scanTimer); scanTimer = null; }
+
+async function scanOnce(){
+  if(!detector) return;
+  if(video.readyState < 2) return;
+  try{
+    const barcodes = await detector.detect(video);
+    if(!barcodes || !barcodes.length) return;
+    const raw = barcodes[0].rawValue || "";
+    if(!raw) return;
+    if(state.lastScan.ean === raw) return;
+
+    state.lastScan.ean = raw;
+    eanText.textContent = raw;
+
+    const prod = findProductByEAN(raw);
+    if(prod){
+      state.lastScan.matchId = prod.id;
+      const qty = Number(state.stock[prod.id] ?? 0);
+      matchText.textContent = `Trouvé : ${prod.name}`;
+      scanBadge.textContent = `x${qty}`;
+      btnConfirmDeduct.disabled = false;
+    }else{
+      state.lastScan.matchId = null;
+      matchText.textContent = "EAN inconnu (ajoute le code-barres)";
+      scanBadge.textContent = "x?";
+      btnConfirmDeduct.disabled = true;
+    }
+  }catch(e){}
+}
+
+async function toggleTorch(){
+  if(!trackForTorch) return toastMsg("Flash non dispo");
+  const caps = trackForTorch.getCapabilities ? trackForTorch.getCapabilities() : {};
+  if(!caps.torch) return toastMsg("Flash non dispo");
+  torchOn = !torchOn;
+  try{
+    await trackForTorch.applyConstraints({ advanced: [{ torch: torchOn }] });
+    toastMsg(torchOn ? "Flash ON" : "Flash OFF");
+  }catch(e){ toastMsg("Flash impossible"); }
+}
+
+function deductOneFromMatched(){
+  const id = state.lastScan.matchId;
+  if(!id) return;
+  const v = Number(state.stock[id] ?? 0);
+  if(v <= 0) return toastMsg("Déjà à 0");
+  state.stock[id] = v - 1;
+  save(); render();
+  const p = PRODUCTS.find(x=>x.id===id);
+  toastMsg(`-1 ${p ? p.name : ""}`);
+  scanBadge.textContent = `x${state.stock[id]}`;
+}
+
+fabScan.addEventListener("click", openScanner);
+btnCloseScan.addEventListener("click", closeScanner);
+scanModal.addEventListener("click", (e)=>{ if(e.target === scanModal) closeScanner(); });
+btnTorch.addEventListener("click", toggleTorch);
+btnCancelDeduct.addEventListener("click", ()=>{
+  state.lastScan = { ean:"", matchId:null };
+  eanText.textContent = "—";
+  matchText.textContent = "Présente la bouteille dans le cadre";
+  scanBadge.textContent = "x0";
+  btnConfirmDeduct.disabled = true;
+});
+btnConfirmDeduct.addEventListener("click", ()=>{
+  if(!state.lastScan.matchId) return;
+  if(!confirm("Confirmer la déduction de 1 unité ?")) return;
+  deductOneFromMatched();
+});
+
+/* Boot */
+load();
+render();
+</script>
+</body>
+</html>
