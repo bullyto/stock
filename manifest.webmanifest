@@ -1,8 +1,21 @@
 {
-  "name": "Stock V\u00e9hicule",
+  "name": "Stock Véhicule",
   "short_name": "Stock",
-  "start_url": "./index.html",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#05070b",
-  "theme_color": "#05070b"
+  "theme_color": "#05070b",
+  "description": "Gestion du stock du véhicule en temps réel (offline).",
+  "icons": [
+    {
+      "src": "icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ]
 }
