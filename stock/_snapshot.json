@@ -1,5 +1,6 @@
 {
-  "generatedAt": "2026-01-02T01:50:25Z",
+  "v": 1,
+  "updatedAt": "2026-01-02T02:27:02.910Z",
   "items": [
     {
       "id": "tequila_sanjose",
@@ -83,7 +84,7 @@
     },
     {
       "id": "poliakov",
-      "qty": 0
+      "qty": 18
     },
     {
       "id": "absolut",
