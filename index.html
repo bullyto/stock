@@ -12,12 +12,13 @@
 
   <style>
     :root{
-      --bg0:#020307; --bg1:#05070b; --bg2:#070a10;
+      --bg0:#020308; --bg1:#05070b; --bg2:#070a10;
       --txt:#ecf3ff; --mut:#9fb0c8;
       --accent:#39d98a; --accent2:#47c9ff; --warn:#ffb020; --bad:#ff4d6d;
       --shadow: 0 26px 80px rgba(0,0,0,.72);
       --shadow2: 0 14px 40px rgba(0,0,0,.58);
     }
+
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
@@ -25,20 +26,21 @@
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
       color:var(--txt);
       background:
-        radial-gradient(1000px 700px at 18% 10%, rgba(71,201,255,.10), transparent 60%),
-        radial-gradient(900px 700px at 82% 18%, rgba(57,217,138,.08), transparent 60%),
-        radial-gradient(1200px 900px at 50% 120%, rgba(57,217,138,.06), transparent 60%),
-        linear-gradient(180deg, var(--bg0), var(--bg1) 40%, var(--bg2));
+        radial-gradient(1100px 780px at 16% 10%, rgba(71,201,255,.10), transparent 60%),
+        radial-gradient(980px 760px at 84% 14%, rgba(57,217,138,.09), transparent 60%),
+        radial-gradient(1300px 950px at 50% 120%, rgba(57,217,138,.06), transparent 60%),
+        linear-gradient(180deg, var(--bg0), var(--bg1) 42%, var(--bg2));
       overflow-x:hidden;
     }
+
     .wrap{max-width:1100px;margin:0 auto;padding:10px 14px 0}
     .header{
       position: sticky; top: 0; z-index: 60;
       padding-top: env(safe-area-inset-top);
-      background: linear-gradient(180deg, rgba(2,3,7,.97), rgba(2,3,7,.82) 65%, rgba(2,3,7,0));
+      background: linear-gradient(180deg, rgba(2,3,8,.97), rgba(2,3,8,.84) 65%, rgba(2,3,8,0));
       backdrop-filter: blur(12px);
     }
-    .headerInner{display:flex; gap:12px; align-items:center; justify-content:space-between; padding: 10px 0 14px;}
+    .headerInner{display:flex; gap:12px; align-items:flex-start; justify-content:space-between; padding: 10px 0 12px;}
     .brand{display:flex; gap:12px; align-items:center;}
     .logo{
       width:44px;height:44px;border-radius:14px;
@@ -60,11 +62,12 @@
     }
     @keyframes spin{to{transform:rotate(360deg)}}
 
-    .titleBox{line-height:1.1}
+    .titleBox{line-height:1.12}
     .title{font-size:16px;font-weight:950;letter-spacing:.3px}
     .subtitle{margin-top:4px;font-size:12px;color:var(--mut);letter-spacing:.2px}
+    .subtitle strong{color:rgba(236,243,255,.88); font-weight:900}
 
-    .actions{display:flex; gap:10px; align-items:center}
+    .actions{display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:flex-end}
     .chip{
       display:inline-flex; align-items:center; gap:8px;
       padding: 9px 10px; border-radius: 999px;
@@ -73,6 +76,7 @@
       color: var(--mut); font-size:12px; white-space:nowrap;
     }
     .dot{width:8px;height:8px;border-radius:50%; background: var(--accent); box-shadow: 0 0 0 6px rgba(57,217,138,.09);}
+    .dot.off{background: rgba(255,255,255,.38); box-shadow: 0 0 0 6px rgba(255,255,255,.06);}
     .btn{
       border:1px solid rgba(255,255,255,.10);
       background: rgba(255,255,255,.05);
@@ -83,10 +87,11 @@
       font-size: 13px;
       display:inline-flex; align-items:center; gap:10px;
       cursor:pointer; box-shadow: 0 10px 26px rgba(0,0,0,.40);
-      user-select:none; transition: transform .08s ease, filter .15s ease;
+      user-select:none; transition: transform .08s ease, filter .15s ease, opacity .15s ease;
     }
     .btn:hover{filter:brightness(1.07)}
     .btn:active{transform:translateY(1px)}
+    .btn[disabled]{opacity:.55; cursor:not-allowed; filter:none}
     .btn.primary{
       border-color: rgba(57,217,138,.22);
       background: linear-gradient(180deg, rgba(57,217,138,.16), rgba(255,255,255,.05));
@@ -150,6 +155,7 @@
         radial-gradient(220px 140px at 70% 30%, rgba(57,217,138,.08), transparent 60%);
       position:relative;
     }
+
     .bottle{
       width: 104px;
       height: 128px;
@@ -170,7 +176,7 @@
     }
     .bottle.hasimg .fallback{display:none}
 
-    /* Badges multiplicateur */
+    /* Badges multiplicateur (on les garde beaux !) */
     .badgeQty{
       position:absolute; top: 10px; right: 10px;
       padding: 8px 10px; border-radius: 999px;
@@ -206,26 +212,27 @@
     .ctl.plus{border-color: rgba(57,217,138,.22); background: linear-gradient(180deg, rgba(57,217,138,.18), rgba(255,255,255,.05));}
     .ctl.minus{border-color: rgba(255,77,109,.18); background: linear-gradient(180deg, rgba(255,77,109,.14), rgba(255,255,255,.05));}
     .ctl:active{transform:translateY(1px)}
+    .rowChips{margin-top:10px;display:flex;gap:10px;flex-wrap:wrap}
 
-    /* FAB (opacité quasi totale) */
+    /* FAB (scanner) — opacité quasi totale */
     .fab{position: fixed; right: 16px; bottom: calc(env(safe-area-inset-bottom) + 16px); z-index: 80;
       width: 62px; height: 62px; border-radius: 22px;
-      border: 1px solid rgba(255,255,255,.14);
+      border: 1px solid rgba(255,255,255,.16);
       background:
-        radial-gradient(30px 30px at 30% 30%, rgba(71,201,255,.30), transparent 60%),
-        radial-gradient(30px 30px at 70% 70%, rgba(57,217,138,.30), transparent 60%),
-        linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.05));
-      box-shadow: 0 20px 65px rgba(0,0,0,.60);
+        radial-gradient(30px 30px at 30% 30%, rgba(71,201,255,.36), transparent 60%),
+        radial-gradient(30px 30px at 70% 70%, rgba(57,217,138,.36), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.06));
+      box-shadow: 0 22px 70px rgba(0,0,0,.62);
       display:flex; align-items:center; justify-content:center; cursor:pointer; user-select:none; overflow:hidden;
-      opacity:.95;
+      opacity: .96;
     }
     .fab:after{content:""; position:absolute; inset:-60%;
-      background: conic-gradient(from 0deg, rgba(71,201,255,0), rgba(71,201,255,.40), rgba(57,217,138,.40), rgba(71,201,255,0));
-      filter: blur(14px); opacity:.50; animation: spin 7s linear infinite;
+      background: conic-gradient(from 0deg, rgba(71,201,255,0), rgba(71,201,255,.44), rgba(57,217,138,.44), rgba(71,201,255,0));
+      filter: blur(14px); opacity:.52; animation: spin 7s linear infinite;
     }
     .fab svg{position:relative}
 
-    /* Modals */
+    /* Scanner modal */
     .modal{position:fixed; inset:0; background: rgba(0,0,0,.72); backdrop-filter: blur(10px); z-index: 110;
       opacity:0; pointer-events:none; transition: opacity .18s ease;
       display:flex; align-items:flex-end; padding: 12px; padding-bottom: calc(env(safe-area-inset-bottom) + 12px);
@@ -266,12 +273,42 @@
     .confirmRow button.ok{border-color: rgba(57,217,138,.22); background: linear-gradient(180deg, rgba(57,217,138,.18), rgba(255,255,255,.05));}
     .confirmRow button.no{border-color: rgba(255,77,109,.18); background: linear-gradient(180deg, rgba(255,77,109,.14), rgba(255,255,255,.05));}
     .confirmRow button:active{transform:translateY(1px)}
-    .form{display:grid; gap:10px}
-    .field{display:grid; gap:6px}
-    .field label{font-size:12px; color:var(--mut); font-weight:900}
-    .field input{padding:12px 12px; border-radius:16px; border:1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.05); color:var(--txt); font-weight:900; outline:none}
-    .hint{font-size:12px;color:rgba(159,176,200,.75);font-weight:850; line-height:1.3}
+    .confirmRow button:disabled{opacity:.55; cursor:not-allowed}
 
+    /* Settings modal */
+    .settings{position:fixed; inset:0; z-index: 130;
+      background: rgba(0,0,0,.72); backdrop-filter: blur(12px);
+      opacity:0; pointer-events:none; transition: opacity .18s ease;
+      display:flex; align-items:flex-end; padding: 12px; padding-bottom: calc(env(safe-area-inset-bottom) + 12px);
+    }
+    .settings.show{opacity:1; pointer-events:auto;}
+    .settingsCard{width:100%; max-width: 720px; margin: 0 auto; border-radius: 26px; border:1px solid rgba(255,255,255,.12);
+      background: linear-gradient(180deg, rgba(9,12,18,.96), rgba(6,8,12,.96)); box-shadow: var(--shadow); overflow:hidden;
+    }
+    .settingsTop{padding: 12px 14px; display:flex; align-items:center; justify-content:space-between; gap:10px; border-bottom: 1px solid rgba(255,255,255,.10);}
+    .settingsTop b{font-weight:1000; letter-spacing:.2px}
+    .settingsBody{padding: 12px 14px}
+    .formGrid{display:grid; grid-template-columns: 1fr 1fr; gap: 10px;}
+    @media (max-width: 680px){ .formGrid{grid-template-columns: 1fr;} }
+    .field{display:flex; flex-direction:column; gap:6px}
+    .field label{font-size:12px; color: rgba(159,176,200,.86); font-weight:900}
+    .field input{
+      padding: 12px 12px; border-radius: 16px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      color: var(--txt);
+      outline:none;
+      font-weight: 900;
+    }
+    .help{margin-top:10px; color: rgba(159,176,200,.82); font-size:12px; font-weight:850; line-height:1.35}
+    .help code{background: rgba(255,255,255,.06); padding: 2px 6px; border-radius: 8px; border:1px solid rgba(255,255,255,.10)}
+    .settingsActions{margin-top:12px; display:grid; grid-template-columns: 1fr 1fr; gap:10px;}
+    .settingsActions .btn{width:100%; justify-content:center}
+    .settingsActions .btn.primary{justify-content:center}
+    .settingsActions3{margin-top:10px; display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px;}
+    @media (max-width: 680px){ .settingsActions3{grid-template-columns: 1fr;} }
+
+    /* Toast */
     .toast{position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom) + 92px);
       transform: translateX(-50%);
       padding: 10px 12px; border-radius: 999px; border:1px solid rgba(255,255,255,.12);
@@ -292,25 +329,28 @@
           <div class="logo" aria-hidden="true"></div>
           <div class="titleBox">
             <div class="title">Stock Véhicule</div>
-            <div class="subtitle">Temps réel • Tap sur une bouteille pour ajuster (+/–)</div>
+            <div class="subtitle" id="subtitleLine">
+              Temps réel • Tap sur une bouteille pour ajuster (+/–)
+              <br><strong id="miniStats">—</strong>
+            </div>
           </div>
         </div>
 
         <div class="actions">
-          <div class="chip"><span class="dot"></span><span id="chipStatus">Offline</span></div>
+          <div class="chip"><span class="dot off" id="dotNet"></span><span id="chipStatus">Offline</span></div>
 
-          <button class="btn" type="button" id="btnSettings" title="Paramètres / Token">
+          <button class="btn" type="button" id="btnSettings" title="Paramètres (token GitHub)">
             <svg class="icon" viewBox="0 0 24 24" fill="none">
               <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" stroke="currentColor" stroke-width="2"/>
-              <path d="M19.4 15a7.8 7.8 0 0 0 .1-1l2-1.5-2-3.4-2.4.6a7.6 7.6 0 0 0-.8-.5L15 6h-4l-.9 2.2a7.6 7.6 0 0 0-.8.5l-2.4-.6-2 3.4 2 1.5a7.8 7.8 0 0 0 .1 1l-2 1.5 2 3.4 2.4-.6c.26.2.52.36.8.5L11 18h4l.9-2.2c.28-.14.54-.3.8-.5l2.4.6 2-3.4-2-1.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+              <path d="M19.4 15a7.8 7.8 0 0 0 .1-1l2-1.2-2-3.5-2.3.7a7.8 7.8 0 0 0-1.7-1L15 4h-6l-.5 2.9a7.8 7.8 0 0 0-1.7 1L4.5 7.2l-2 3.5 2 1.2a7.8 7.8 0 0 0 0 2l-2 1.2 2 3.5 2.3-.7a7.8 7.8 0 0 0 1.7 1L9 20h6l.5-2.9a7.8 7.8 0 0 0 1.7-1l2.3.7 2-3.5-2-1.2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
             </svg>
             Paramètres
           </button>
 
-          <button class="btn primary" type="button" id="btnSync" title="Enregistrer le stock en dépôt GitHub">
+          <button class="btn primary" type="button" id="btnSaveRepo" title="Enregistrer le stock en dépôt (GitHub)">
             <svg class="icon" viewBox="0 0 24 24" fill="none">
               <path d="M12 3v10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              <path d="M8 7l4-4 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M8 9l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               <path d="M5 14v5h14v-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
             </svg>
             Enregistrer dépôt
@@ -365,7 +405,7 @@
           <div class="ctl plus" id="btnPlus">+ 1</div>
         </div>
 
-        <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap">
+        <div class="rowChips">
           <div class="chip"><span class="dot" style="background:var(--accent2)"></span><span>Tap carte = ouvrir</span></div>
           <div class="chip"><span class="dot" style="background:var(--warn)"></span><span>Faible ≤ 2</span></div>
           <div class="chip"><span class="dot" style="background:var(--bad)"></span><span>Rupture = 0</span></div>
@@ -374,7 +414,6 @@
     </div>
   </div>
 
-  <!-- Scanner modal -->
   <div class="modal" id="scanModal" aria-hidden="true">
     <div class="modalCard">
       <div class="modalTop">
@@ -408,46 +447,54 @@
     </div>
   </div>
 
-  <!-- Settings modal -->
-  <div class="modal" id="settingsModal" aria-hidden="true">
-    <div class="modalCard">
-      <div class="modalTop">
-        <b>Paramètres</b>
+  <!-- Settings -->
+  <div class="settings" id="settings" aria-hidden="true">
+    <div class="settingsCard">
+      <div class="settingsTop">
+        <b>Paramètres dépôt (GitHub)</b>
         <div class="right">
           <button class="miniBtn primary" id="btnCloseSettings" type="button">Fermer</button>
         </div>
       </div>
-      <div class="modalBody">
-        <div class="form">
+
+      <div class="settingsBody">
+        <div class="formGrid">
           <div class="field">
-            <label>Token GitHub (classic) — stocké en local</label>
-            <input id="ghToken" type="password" autocomplete="off" placeholder="ghp_... / github_pat_..." />
-            <div class="hint">Astuce : crée un token avec accès au dépôt + permission de modifier le contenu.</div>
+            <label>Owner</label>
+            <input id="ghOwner" placeholder="ex: bullyto" autocomplete="off" />
           </div>
-
           <div class="field">
-            <label>Repo (owner / repo)</label>
-            <input id="ghRepo" type="text" placeholder="bullyto/stock-vehicule" />
+            <label>Repo</label>
+            <input id="ghRepo" placeholder="ex: stock" autocomplete="off" />
           </div>
-
           <div class="field">
-            <label>Branche</label>
-            <input id="ghBranch" type="text" placeholder="main" />
+            <label>Branch</label>
+            <input id="ghBranch" placeholder="main" autocomplete="off" />
           </div>
-
           <div class="field">
-            <label>Chemin fichier (dans le repo)</label>
-            <input id="ghPath" type="text" placeholder="data/stock.json" />
+            <label>Dossier stock</label>
+            <input id="ghPath" placeholder="stock" autocomplete="off" />
           </div>
+          <div class="field">
+            <label>Extension fichiers</label>
+            <input id="ghExt" placeholder=".json" autocomplete="off" />
+          </div>
+          <div class="field">
+            <label>Token GitHub (PAT)</label>
+            <input id="ghToken" placeholder="ghp_..." autocomplete="off" />
+          </div>
+        </div>
 
-          <div class="confirmRow">
-            <button class="no" id="btnResetStock" type="button">Reset stock</button>
-            <button class="ok" id="btnSaveSettings" type="button">Enregistrer</button>
-          </div>
+        <div class="help">
+          • Le stock est enregistré <strong>1 fichier par bouteille</strong> : <code>stock/&lt;id-bouteille&gt;.json</code> (ex: <code>stock/poliakov.json</code>).<br>
+          • Le token est stocké <strong>uniquement en local</strong> (LocalStorage).<br>
+          • Astuce : tu peux laisser le token vide pour juste <em>lire</em> (repo public), mais pour <em>écrire</em> il faut un token.
+        </div>
 
-          <div class="hint">
-            Le bouton <b>Enregistrer dépôt</b> en haut enverra le JSON du stock vers ton repo via l’API GitHub (Contents).
-          </div>
+        <div class="settingsActions3">
+          <button class="btn" id="btnSaveSettings" type="button">Enregistrer paramètres</button>
+          <button class="btn" id="btnPullRepo" type="button">Charger depuis dépôt</button>
+          <button class="btn primary" id="btnPushRepo" type="button">Enregistrer dépôt</button>
         </div>
       </div>
     </div>
@@ -458,285 +505,155 @@
 <script>
 "use strict";
 
-/* ====== PWA: register + force update ====== */
+/* ========= PWA / Service Worker (update sans galère) ========= */
 const chipStatus = document.getElementById("chipStatus");
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", async () => {
-    try {
-      const reg = await navigator.serviceWorker.register("./sw.js");
+const dotNet = document.getElementById("dotNet");
 
-      // force check update now + when coming back
-      const check = () => reg.update().catch(()=>{});
-      check();
-      document.addEventListener("visibilitychange", () => {
-        if (document.visibilityState === "visible") check();
+async function registerSW(){
+  if (!("serviceWorker" in navigator)) return;
+  try{
+    const reg = await navigator.serviceWorker.register("./sw.js");
+    // Force check update
+    reg.update?.();
+
+    // If a new SW is waiting => apply immediately
+    if (reg.waiting) reg.waiting.postMessage("SKIP_WAITING");
+
+    // When controller changes => reload to use new assets
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      // avoid infinite reload loop
+      if (window.__reloadedOnce) return;
+      window.__reloadedOnce = true;
+      location.reload();
+    });
+
+    // If a new SW installs later
+    reg.addEventListener("updatefound", () => {
+      const nw = reg.installing;
+      if(!nw) return;
+      nw.addEventListener("statechange", () => {
+        if (nw.state === "installed" && navigator.serviceWorker.controller) {
+          reg.waiting?.postMessage("SKIP_WAITING");
+        }
       });
-
-      // if waiting, activate immediately
-      if (reg.waiting) reg.waiting.postMessage("SKIP_WAITING");
-
-      // if update found, activate when installed
-      reg.addEventListener("updatefound", () => {
-        const nw = reg.installing;
-        if (!nw) return;
-        nw.addEventListener("statechange", () => {
-          if (nw.state === "installed" && navigator.serviceWorker.controller) {
-            nw.postMessage("SKIP_WAITING");
-          }
-        });
-      });
-
-      // when controller changes, reload once
-      let reloaded = false;
-      navigator.serviceWorker.addEventListener("controllerchange", () => {
-        if (reloaded) return;
-        reloaded = true;
-        location.reload();
-      });
-
-      chipStatus.textContent = navigator.onLine ? "Online" : "Offline";
-    } catch {
-      chipStatus.textContent = "Offline";
-    }
-  });
+    });
+  }catch{}
 }
-window.addEventListener("online", ()=> chipStatus.textContent = "Online");
-window.addEventListener("offline", ()=> chipStatus.textContent = "Offline");
 
-/* ====== Data ====== */
+function updateOnlineUI(){
+  const online = navigator.onLine;
+  chipStatus.textContent = online ? "Online" : "Offline";
+  dotNet.classList.toggle("off", !online);
+}
+window.addEventListener("online", updateOnlineUI);
+window.addEventListener("offline", updateOnlineUI);
+window.addEventListener("load", () => { updateOnlineUI(); registerSW(); });
+
+/* ========= Data ========= */
 const LOW_THRESHOLD = 2;
 const LS_KEY = "stock_vehicle_v2";
+const SETTINGS_KEY = "stock_vehicle_settings_v1";
 const IMG_DIR = "./img/";
 
-const LS_GH = "stock_vehicle_github";
-
 const PRODUCTS = [
-  {
-    "id": "tequila_sanjose",
-    "name": "Tequila San José",
-    "barcode": ""
-  },
-  {
-    "id": "gibsons_gin",
-    "name": "Gibson’s Gin",
-    "barcode": ""
-  },
-  {
-    "id": "jagermeister",
-    "name": "Jägermeister",
-    "barcode": ""
-  },
-  {
-    "id": "perrier",
-    "name": "Perrier",
-    "barcode": ""
-  },
-  {
-    "id": "pastis_51",
-    "name": "Pastis 51",
-    "barcode": "3047100000247"
-  },
-  {
-    "id": "ricard",
-    "name": "Ricard",
-    "barcode": ""
-  },
-  {
-    "id": "havana_3ans",
-    "name": "Havana Club 3 ans",
-    "barcode": ""
-  },
-  {
-    "id": "get_27",
-    "name": "GET 27",
-    "barcode": "7610113009214"
-  },
-  {
-    "id": "gordons_gin",
-    "name": "Gordon’s Gin",
-    "barcode": "5000289925440"
-  },
-  {
-    "id": "liqueur_cassis",
-    "name": "Liqueur de cassis",
-    "barcode": ""
-  },
-  {
-    "id": "jack_old7",
-    "name": "Jack Daniel’s Old No.7",
-    "barcode": "3099873045864"
-  },
-  {
-    "id": "jack_honey",
-    "name": "Jack Daniel’s Tennessee Honey",
-    "barcode": "5099873001370"
-  },
-  {
-    "id": "old_nick_darkwood",
-    "name": "Old Nick Dark Wood",
-    "barcode": ""
-  },
-  {
-    "id": "captain_morgan",
-    "name": "Captain Morgan Spiced Gold",
-    "barcode": "5000281015249"
-  },
-  {
-    "id": "saint_james_blanc",
-    "name": "Saint James Rhum Blanc",
-    "barcode": ""
-  },
-  {
-    "id": "trois_rivieres",
-    "name": "Trois Rivières Rhum Blanc",
-    "barcode": ""
-  },
-  {
-    "id": "havana_especial",
-    "name": "Havana Club Especial",
-    "barcode": ""
-  },
-  {
-    "id": "old_nick_blanc",
-    "name": "Old Nick Rhum Blanc",
-    "barcode": ""
-  },
-  {
-    "id": "clan_campbell",
-    "name": "Clan Campbell",
-    "barcode": ""
-  },
-  {
-    "id": "ballantines",
-    "name": "Ballantine’s Finest",
-    "barcode": ""
-  },
-  {
-    "id": "poliakov",
-    "name": "Poliakov Vodka",
-    "barcode": "3147690130223"
-  },
-  {
-    "id": "absolut",
-    "name": "Absolut Vodka",
-    "barcode": "7312040017067"
-  },
-  {
-    "id": "ciroc_pomme",
-    "name": "Cîroc Pomme",
-    "barcode": ""
-  },
-  {
-    "id": "ciroc_classic",
-    "name": "Cîroc Classic",
-    "barcode": ""
-  },
-  {
-    "id": "ciroc_redberry",
-    "name": "Cîroc Red Berry",
-    "barcode": ""
-  },
-  {
-    "id": "william_peel",
-    "name": "William Peel",
-    "barcode": "5010327000148"
-  },
-  {
-    "id": "label_5",
-    "name": "Label 5 Classic Black",
-    "barcode": "3147690128573"
-  },
-  {
-    "id": "vin_rouge",
-    "name": "Vin rouge",
-    "barcode": ""
-  },
-  {
-    "id": "vin_blanc",
-    "name": "Vin blanc",
-    "barcode": ""
-  },
-  {
-    "id": "vin_rose",
-    "name": "Vin rosé",
-    "barcode": ""
-  },
-  {
-    "id": "muscat",
-    "name": "Muscat",
-    "barcode": ""
-  }
+  { id:"tequila_sanjose", name:"Tequila San José", barcode:"" },
+  { id:"gibsons_gin", name:"Gibson’s Gin", barcode:"" },
+  { id:"jagermeister", name:"Jägermeister", barcode:"" },
+  { id:"perrier", name:"Perrier", barcode:"" },
+  { id:"pastis_51", name:"Pastis 51", barcode:"3047100000247" },
+  { id:"ricard", name:"Ricard", barcode:"" },
+  { id:"havana_3ans", name:"Havana Club 3 ans", barcode:"" },
+  { id:"get_27", name:"GET 27", barcode:"7610113009214" },
+  { id:"gordons_gin", name:"Gordon’s Gin", barcode:"5000289925440" },
+  { id:"liqueur_cassis", name:"Liqueur de cassis", barcode:"" },
+  { id:"jack_old7", name:"Jack Daniel’s Old No.7", barcode:"3099873045864" },
+  { id:"jack_honey", name:"Jack Daniel’s Tennessee Honey", barcode:"5099873001370" },
+  { id:"old_nick_darkwood", name:"Old Nick Dark Wood", barcode:"" },
+  { id:"captain_morgan", name:"Captain Morgan Spiced Gold", barcode:"5000281015249" },
+  { id:"saint_james_blanc", name:"Saint James Rhum Blanc", barcode:"" },
+  { id:"trois_rivieres", name:"Trois Rivières Rhum Blanc", barcode:"" },
+  { id:"havana_especial", name:"Havana Club Especial", barcode:"" },
+  { id:"old_nick_blanc", name:"Old Nick Rhum Blanc", barcode:"" },
+  { id:"clan_campbell", name:"Clan Campbell", barcode:"" },
+  { id:"ballantines", name:"Ballantine’s Finest", barcode:"" },
+  { id:"poliakov", name:"Poliakov Vodka", barcode:"3147690130223" },
+  { id:"absolut", name:"Absolut Vodka", barcode:"7312040017067" },
+  { id:"ciroc_pomme", name:"Cîroc Pomme", barcode:"" },
+  { id:"ciroc_classic", name:"Cîroc Classic", barcode:"" },
+  { id:"ciroc_redberry", name:"Cîroc Red Berry", barcode:"" },
+  { id:"william_peel", name:"William Peel", barcode:"5010327000148" },
+  { id:"label_5", name:"Label 5 Classic Black", barcode:"3147690128573" },
+  { id:"vin_rouge", name:"Vin rouge", barcode:"" },
+  { id:"vin_blanc", name:"Vin blanc", barcode:"" },
+  { id:"vin_rose", name:"Vin rosé", barcode:"" },
+  { id:"muscat", name:"Muscat", barcode:"" }
 ];
 
-function seededStock(){
-  const seed = {
-  "tequila_sanjose": 2,
-  "gibsons_gin": 0,
-  "jagermeister": 0,
-  "perrier": 1,
-  "pastis_51": 0,
-  "ricard": 1,
-  "havana_3ans": 0,
-  "get_27": 0,
-  "gordons_gin": 0,
-  "liqueur_cassis": 0,
-  "jack_old7": 0,
-  "jack_honey": 0,
-  "old_nick_darkwood": 0,
-  "captain_morgan": 0,
-  "saint_james_blanc": 3,
-  "trois_rivieres": 3,
-  "havana_especial": 3,
-  "old_nick_blanc": 3,
-  "clan_campbell": 3,
-  "ballantines": 3,
-  "poliakov": 3,
-  "absolut": 3,
-  "ciroc_pomme": 3,
-  "ciroc_classic": 3,
-  "ciroc_redberry": 3,
-  "william_peel": 3,
-  "label_5": 3,
-  "vin_rouge": 3,
-  "vin_blanc": 3,
-  "vin_rose": 0,
-  "muscat": 3
+const SEED_STOCK = {
+  // 31 produits, 52 unités total, 15 faible/rupture
+  perrier:3, pastis_51:3, ricard:3, get_27:3, captain_morgan:3, clan_campbell:3, ballantines:3, poliakov:3, absolut:3,
+  william_peel:3, label_5:3, jack_old7:3, jack_honey:3, vin_rouge:3, vin_blanc:3, vin_rose:3,
+
+  tequila_sanjose:1, gibsons_gin:1, jagermeister:1, muscat:1,
+
+  havana_3ans:0, gordons_gin:0, liqueur_cassis:0, old_nick_darkwood:0, old_nick_blanc:0, saint_james_blanc:0,
+  trois_rivieres:0, havana_especial:0, ciroc_pomme:0, ciroc_classic:0, ciroc_redberry:0
 };
+
+const state = {
+  filter: "all",
+  q: "",
+  selectedId: null,
+  stock: {},
+  dirty: {},     // {id:true} => modifié localement non poussé
+  settings: null,
+  lastScan: { ean:"", matchId:null }
+};
+
+function seededStock(){
   const s = {};
-  PRODUCTS.forEach(p => s[p.id] = Number.isFinite(seed[p.id]) ? seed[p.id] : 0);
+  for(const p of PRODUCTS) s[p.id] = Number(SEED_STOCK[p.id] ?? 0);
   return s;
 }
 
-const state = { filter: "all", q: "", selectedId: null, stock: {}, lastScan: { ean:"", matchId:null } };
-
 function load(){
+  // stock local
   try{
     const raw = localStorage.getItem(LS_KEY);
     if(!raw) throw new Error("no");
     const data = JSON.parse(raw);
-    if(!data || typeof data !== "object") throw new Error("bad");
-    if(!data.stock || typeof data.stock !== "object") throw new Error("bad2");
-    state.stock = data.stock;
+    if(!data || typeof data.stock !== "object") throw new Error("bad");
+    state.stock = data.stock || {};
+    state.dirty = data.dirty || {};
   }catch{
     state.stock = seededStock();
+    state.dirty = {};
     save();
   }
-  // ensure any new products exist
-  for(const p of PRODUCTS){
-    if(!Number.isFinite(Number(state.stock[p.id]))) state.stock[p.id] = 0;
+
+  // settings
+  try{
+    const rawS = localStorage.getItem(SETTINGS_KEY);
+    state.settings = rawS ? JSON.parse(rawS) : null;
+  }catch{
+    state.settings = null;
   }
-  save();
 }
 function save(){
-  localStorage.setItem(LS_KEY, JSON.stringify({ v: 2, savedAt: Date.now(), stock: state.stock }));
+  localStorage.setItem(LS_KEY, JSON.stringify({ v: 2, savedAt: Date.now(), stock: state.stock, dirty: state.dirty }));
+}
+function saveSettings(settings){
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+  state.settings = settings;
 }
 
-/* ====== UI refs ====== */
+/* ========= UI ========= */
 const grid = document.getElementById("grid");
 const q = document.getElementById("q");
 const fAll = document.getElementById("fAll");
 const fLow = document.getElementById("fLow");
 const fZero = document.getElementById("fZero");
+const miniStats = document.getElementById("miniStats");
 
 const backdrop = document.getElementById("backdrop");
 const sheet = document.getElementById("sheet");
@@ -766,6 +683,22 @@ function bottleMonogram(name){
   return (a + b).toUpperCase();
 }
 
+function computeStats(){
+  const total = PRODUCTS.length;
+  let units = 0;
+  let lowOrZero = 0;
+  let dirtyCount = 0;
+
+  for(const p of PRODUCTS){
+    const v = Number(state.stock[p.id] ?? 0);
+    units += v;
+    if(v === 0 || v <= LOW_THRESHOLD) lowOrZero++;
+    if(state.dirty[p.id]) dirtyCount++;
+  }
+
+  miniStats.textContent = `${total} produits • ${units} unités • ${lowOrZero} faible/rupture` + (dirtyCount ? ` • ${dirtyCount} à enregistrer` : "");
+}
+
 function filteredProducts(){
   const qq = normalizeName(state.q);
   return PRODUCTS.filter(p => {
@@ -778,7 +711,9 @@ function filteredProducts(){
 }
 
 function render(){
+  computeStats();
   const list = filteredProducts();
+
   grid.innerHTML = list.map(p => {
     const qty = Number(state.stock[p.id] ?? 0);
     const cls = qtyClass(qty);
@@ -811,6 +746,8 @@ function render(){
   grid.querySelectorAll(".card").forEach(el => {
     el.addEventListener("click", () => openSheet(el.dataset.id));
   });
+
+  updateSaveButtonsState();
 }
 
 function openSheet(id){
@@ -836,6 +773,10 @@ function adjust(delta){
   const v = Number(state.stock[id] ?? 0);
   const nv = Math.max(0, v + delta);
   state.stock[id] = nv;
+
+  // mark dirty
+  state.dirty[id] = true;
+
   sheetQty.textContent = nv;
   save();
   render();
@@ -850,7 +791,262 @@ function setFilter(f){
   render();
 }
 
-/* ====== Bind main UI ====== */
+/* ========= GitHub dépôt : 1 fichier par bouteille ========= */
+const btnSaveRepo = document.getElementById("btnSaveRepo");
+const btnSettings = document.getElementById("btnSettings");
+
+function defaultSettings(){
+  return { owner:"", repo:"", branch:"main", stockPath:"stock", ext:".json", token:"" };
+}
+function getSettings(){
+  const s = state.settings || defaultSettings();
+  return {
+    owner: (s.owner||"").trim(),
+    repo: (s.repo||"").trim(),
+    branch: (s.branch||"main").trim() || "main",
+    stockPath: (s.stockPath||"stock").trim().replace(/^\/+|\/+$/g,"") || "stock",
+    ext: (s.ext||".json").trim() || ".json",
+    token: (s.token||"").trim()
+  };
+}
+
+function updateSaveButtonsState(){
+  const s = getSettings();
+  const hasRepo = !!(s.owner && s.repo && s.branch && s.stockPath);
+  const hasToken = !!s.token;
+  const dirtyCount = Object.keys(state.dirty).length;
+  btnSaveRepo.disabled = !(hasRepo && hasToken && dirtyCount);
+}
+
+function b64encodeUnicode(str){
+  // safe base64 for UTF-8
+  return btoa(unescape(encodeURIComponent(str)));
+}
+
+async function ghApi(path, options={}){
+  const s = getSettings();
+  const headers = options.headers || {};
+  headers["Accept"] = "application/vnd.github+json";
+  if(s.token) headers["Authorization"] = "token " + s.token;
+  if(options.json) headers["Content-Type"] = "application/json";
+  const res = await fetch("https://api.github.com" + path, { ...options, headers });
+  return res;
+}
+
+async function ghGetSha(owner, repo, filePath, branch){
+  const res = await ghApi(`/repos/${owner}/${repo}/contents/${encodeURIComponent(filePath).replace(/%2F/g,"/")}?ref=${encodeURIComponent(branch)}`);
+  if(res.status === 404) return null;
+  if(!res.ok) throw new Error("GET sha failed");
+  const data = await res.json();
+  return data.sha || null;
+}
+
+async function ghPutFile(owner, repo, filePath, branch, message, contentStr){
+  const sha = await ghGetSha(owner, repo, filePath, branch).catch(e => { 
+    // if token missing/private might error; bubble
+    throw e;
+  });
+
+  const body = {
+    message,
+    content: b64encodeUnicode(contentStr),
+    branch
+  };
+  if(sha) body.sha = sha;
+
+  const res = await ghApi(`/repos/${owner}/${repo}/contents/${encodeURIComponent(filePath).replace(/%2F/g,"/")}`, {
+    method:"PUT",
+    json:true,
+    body: JSON.stringify(body)
+  });
+  if(!res.ok){
+    const t = await res.text().catch(()=> "");
+    throw new Error("PUT failed: " + res.status + " " + t.slice(0,120));
+  }
+  return true;
+}
+
+function fileForId(id){
+  const s = getSettings();
+  const ext = s.ext.startsWith(".") ? s.ext : ("." + s.ext);
+  return `${s.stockPath}/${id}${ext}`;
+}
+
+function snapshotPath(){
+  const s = getSettings();
+  return `${s.stockPath}/_snapshot.json`;
+}
+
+async function pushToRepo(){
+  const s = getSettings();
+  if(!(s.owner && s.repo && s.token)){
+    toastMsg("Paramètres dépôt incomplets");
+    openSettings();
+    return;
+  }
+  const dirtyIds = Object.keys(state.dirty);
+  if(!dirtyIds.length){
+    toastMsg("Rien à enregistrer");
+    return;
+  }
+
+  btnSaveRepo.disabled = true;
+  toastMsg("Enregistrement…");
+
+  const now = new Date().toISOString();
+  const msgBase = `stock: update ${now}`;
+
+  // pousse en série (plus sûr sur mobile)
+  for(const id of dirtyIds){
+    const qty = Number(state.stock[id] ?? 0);
+    const payload = { id, qty, updatedAt: now };
+    const filePath = fileForId(id);
+    await ghPutFile(s.owner, s.repo, filePath, s.branch, msgBase + ` (${id})`, JSON.stringify(payload, null, 2));
+  }
+
+  // snapshot global (pratique pour charger en 1 requête)
+  const snapshot = {
+    v: 1,
+    updatedAt: now,
+    items: PRODUCTS.map(p => ({ id: p.id, qty: Number(state.stock[p.id] ?? 0) }))
+  };
+  await ghPutFile(s.owner, s.repo, snapshotPath(), s.branch, msgBase + " (_snapshot)", JSON.stringify(snapshot, null, 2));
+
+  // clear dirty
+  state.dirty = {};
+  save();
+  render();
+  toastMsg("Dépôt mis à jour ✅");
+}
+
+async function pullFromRepo(){
+  const s = getSettings();
+  if(!(s.owner && s.repo)){
+    toastMsg("Renseigne owner/repo");
+    openSettings();
+    return;
+  }
+
+  toastMsg("Chargement dépôt…");
+
+  // Try snapshot first (API si token, sinon raw)
+  const snapFile = snapshotPath();
+
+  let snap = null;
+  try{
+    if(s.token){
+      const res = await ghApi(`/repos/${s.owner}/${s.repo}/contents/${encodeURIComponent(snapFile).replace(/%2F/g,"/")}?ref=${encodeURIComponent(s.branch)}`);
+      if(res.ok){
+        const data = await res.json();
+        const content = data.content ? atob(data.content.replace(/\n/g,"")) : "";
+        snap = JSON.parse(content);
+      }
+    }else{
+      const rawUrl = `https://raw.githubusercontent.com/${s.owner}/${s.repo}/${s.branch}/${snapFile}?t=${Date.now()}`;
+      const res = await fetch(rawUrl, { cache:"no-store" });
+      if(res.ok) snap = await res.json();
+    }
+  }catch{}
+
+  if(snap && Array.isArray(snap.items)){
+    for(const it of snap.items){
+      if(!it || !it.id) continue;
+      const v = Number(it.qty);
+      if(Number.isFinite(v) && v >= 0) state.stock[it.id] = Math.floor(v);
+    }
+    // Pull écrase en local (donc on clear dirty)
+    state.dirty = {};
+    save();
+    render();
+    toastMsg("Stock chargé ✅");
+    return;
+  }
+
+  // Fallback: 1 fichier par bouteille (31 req)
+  if(!s.token){
+    toastMsg("Snapshot absent. Mets un token pour charger fichier par fichier.");
+    return;
+  }
+
+  for(const p of PRODUCTS){
+    const filePath = fileForId(p.id);
+    try{
+      const res = await ghApi(`/repos/${s.owner}/${s.repo}/contents/${encodeURIComponent(filePath).replace(/%2F/g,"/")}?ref=${encodeURIComponent(s.branch)}`);
+      if(!res.ok) continue;
+      const data = await res.json();
+      const content = data.content ? atob(data.content.replace(/\n/g,"")) : "";
+      const obj = JSON.parse(content);
+      const v = Number(obj.qty);
+      if(Number.isFinite(v) && v >= 0) state.stock[p.id] = Math.floor(v);
+    }catch{}
+  }
+
+  state.dirty = {};
+  save();
+  render();
+  toastMsg("Stock chargé ✅");
+}
+
+/* ========= Settings modal ========= */
+const settingsEl = document.getElementById("settings");
+const btnCloseSettings = document.getElementById("btnCloseSettings");
+const btnSaveSettings = document.getElementById("btnSaveSettings");
+const btnPullRepo = document.getElementById("btnPullRepo");
+const btnPushRepo = document.getElementById("btnPushRepo");
+
+const ghOwner = document.getElementById("ghOwner");
+const ghRepo = document.getElementById("ghRepo");
+const ghBranch = document.getElementById("ghBranch");
+const ghPath = document.getElementById("ghPath");
+const ghExt = document.getElementById("ghExt");
+const ghToken = document.getElementById("ghToken");
+
+function openSettings(){
+  const s = getSettings();
+  ghOwner.value = s.owner;
+  ghRepo.value = s.repo;
+  ghBranch.value = s.branch || "main";
+  ghPath.value = s.stockPath || "stock";
+  ghExt.value = s.ext || ".json";
+  ghToken.value = s.token || "";
+  settingsEl.classList.add("show");
+  settingsEl.setAttribute("aria-hidden","false");
+}
+function closeSettings(){
+  settingsEl.classList.remove("show");
+  settingsEl.setAttribute("aria-hidden","true");
+}
+
+btnSettings.addEventListener("click", openSettings);
+btnCloseSettings.addEventListener("click", closeSettings);
+settingsEl.addEventListener("click", (e)=>{ if(e.target === settingsEl) closeSettings(); });
+
+btnSaveSettings.addEventListener("click", ()=>{
+  const s = {
+    owner: (ghOwner.value||"").trim(),
+    repo: (ghRepo.value||"").trim(),
+    branch: (ghBranch.value||"main").trim() || "main",
+    stockPath: (ghPath.value||"stock").trim(),
+    ext: (ghExt.value||".json").trim() || ".json",
+    token: (ghToken.value||"").trim()
+  };
+  saveSettings(s);
+  render();
+  toastMsg("Paramètres OK ✅");
+  closeSettings();
+});
+
+btnPullRepo.addEventListener("click", async ()=>{
+  await pullFromRepo();
+});
+btnPushRepo.addEventListener("click", async ()=>{
+  await pushToRepo();
+  closeSettings();
+});
+
+btnSaveRepo.addEventListener("click", pushToRepo);
+
+/* ========= Bind UI ========= */
 backdrop.addEventListener("click", closeSheet);
 btnMinus.addEventListener("click", ()=>adjust(-1));
 btnPlus.addEventListener("click", ()=>adjust(+1));
@@ -859,7 +1055,7 @@ fLow.addEventListener("click", ()=>setFilter("low"));
 fZero.addEventListener("click", ()=>setFilter("zero"));
 q.addEventListener("input", ()=>{ state.q = q.value || ""; render(); });
 
-/* ====== Scanner EAN (BarcodeDetector) ====== */
+/* ========= Scanner EAN (BarcodeDetector) ========= */
 const fabScan = document.getElementById("fabScan");
 const scanModal = document.getElementById("scanModal");
 const btnCloseScan = document.getElementById("btnCloseScan");
@@ -874,8 +1070,8 @@ const video = document.getElementById("video");
 let stream = null;
 let detector = null;
 let scanTimer = null;
-let trackForTorch = null;
 let torchOn = false;
+let trackForTorch = null;
 
 function findProductByEAN(ean){
   ean = String(ean||"").trim();
@@ -944,10 +1140,6 @@ async function scanOnce(){
 
     const raw = barcodes[0].rawValue || "";
     if(!raw) return;
-
-    // ignore non numeric codes (reduces false positives)
-    if(!/^\d{8,14}$/.test(raw)) return;
-
     if(state.lastScan.ean === raw) return;
 
     state.lastScan.ean = raw;
@@ -986,6 +1178,7 @@ function deductOneFromMatched(){
   const v = Number(state.stock[id] ?? 0);
   if(v <= 0){ toastMsg("Déjà à 0"); return; }
   state.stock[id] = v - 1;
+  state.dirty[id] = true;
   save();
   render();
   const p = PRODUCTS.find(x=>x.id===id);
@@ -1010,149 +1203,20 @@ btnConfirmDeduct.addEventListener("click", ()=>{
   deductOneFromMatched();
 });
 
-/* ====== Settings + GitHub Sync ====== */
-const btnSettings = document.getElementById("btnSettings");
-const settingsModal = document.getElementById("settingsModal");
-const btnCloseSettings = document.getElementById("btnCloseSettings");
-const btnSaveSettings = document.getElementById("btnSaveSettings");
-const btnResetStock = document.getElementById("btnResetStock");
-const btnSync = document.getElementById("btnSync");
-
-const ghToken = document.getElementById("ghToken");
-const ghRepo = document.getElementById("ghRepo");
-const ghBranch = document.getElementById("ghBranch");
-const ghPath = document.getElementById("ghPath");
-
-function loadGh(){
-  try{
-    const raw = localStorage.getItem(LS_GH);
-    const d = raw ? JSON.parse(raw) : {};
-    return {
-      token: d.token || "",
-      repo: d.repo || "",
-      branch: d.branch || "main",
-      path: d.path || "data/stock.json"
-    };
-  }catch{
-    return { token:"", repo:"", branch:"main", path:"data/stock.json" };
-  }
-}
-function saveGh(cfg){
-  localStorage.setItem(LS_GH, JSON.stringify(cfg));
-}
-
-function openSettings(){
-  const cfg = loadGh();
-  ghToken.value = cfg.token || "";
-  ghRepo.value = cfg.repo || "";
-  ghBranch.value = cfg.branch || "main";
-  ghPath.value = cfg.path || "data/stock.json";
-  settingsModal.classList.add("show");
-  settingsModal.setAttribute("aria-hidden","false");
-}
-function closeSettings(){
-  settingsModal.classList.remove("show");
-  settingsModal.setAttribute("aria-hidden","true");
-}
-btnSettings.addEventListener("click", openSettings);
-btnCloseSettings.addEventListener("click", closeSettings);
-settingsModal.addEventListener("click", (e)=>{ if(e.target === settingsModal) closeSettings(); });
-
-btnSaveSettings.addEventListener("click", ()=>{
-  const cfg = {
-    token: (ghToken.value || "").trim(),
-    repo: (ghRepo.value || "").trim(),
-    branch: (ghBranch.value || "main").trim(),
-    path: (ghPath.value || "data/stock.json").trim()
-  };
-  saveGh(cfg);
-  toastMsg("Paramètres enregistrés ✅");
-  closeSettings();
-});
-
-btnResetStock.addEventListener("click", ()=>{
-  if(!confirm("Reset le stock (retour au seed) ?")) return;
-  state.stock = seededStock();
-  save();
-  state.q = "";
-  q.value = "";
-  setFilter("all");
-  toastMsg("Reset ✅");
-  closeSettings();
-});
-
-async function githubPutJson(cfg, obj){
-  if(!cfg.token || !cfg.repo) throw new Error("Token/repo manquant");
-  const [owner, repo] = cfg.repo.split("/");
-  if(!owner || !repo) throw new Error("Repo invalide (owner/repo)");
-
-  const apiBase = `https://api.github.com/repos/${owner}/${repo}/contents/${encodeURIComponent(cfg.path).replace(/%2F/g,'/')}`;
-  const headers = {
-    "Accept": "application/vnd.github+json",
-    "Authorization": "token " + cfg.token
-  };
-
-  // Get existing SHA (if file exists)
-  let sha = null;
-  try{
-    const r = await fetch(apiBase + `?ref=${encodeURIComponent(cfg.branch)}`, { headers });
-    if(r.ok){
-      const j = await r.json();
-      sha = j && j.sha ? j.sha : null;
-    }
-  }catch{}
-
-  const contentStr = JSON.stringify(obj, null, 2);
-  const contentB64 = btoa(unescape(encodeURIComponent(contentStr)));
-
-  const body = {
-    message: `update stock (${new Date().toISOString()})`,
-    content: contentB64,
-    branch: cfg.branch
-  };
-  if(sha) body.sha = sha;
-
-  const put = await fetch(apiBase, {
-    method: "PUT",
-    headers: { ...headers, "Content-Type":"application/json" },
-    body: JSON.stringify(body)
-  });
-
-  if(!put.ok){
-    const t = await put.text().catch(()=> "");
-    throw new Error("GitHub error: " + put.status + " " + t.slice(0,200));
-  }
-  return await put.json();
-}
-
-btnSync.addEventListener("click", async ()=>{
-  const cfg = loadGh();
-  if(!cfg.token || !cfg.repo){
-    toastMsg("Renseigne Token + Repo ⚠️");
-    openSettings();
-    return;
-  }
-  const payload = {
-    v: 2,
-    savedAt: new Date().toISOString(),
-    products: PRODUCTS,
-    stock: state.stock
-  };
-  try{
-    toastMsg("Envoi au dépôt…");
-    await githubPutJson(cfg, payload);
-    toastMsg("Dépôt mis à jour ✅");
-  }catch(err){
-    console.error(err);
-    toastMsg("Erreur dépôt ❌");
-    alert("Erreur dépôt:
-" + (err && err.message ? err.message : String(err)));
-  }
-});
-
-/* ====== Boot ====== */
+/* ========= Boot ========= */
 load();
 render();
+
+// Optionnel : auto-charger depuis dépôt au démarrage (si token + repo configurés)
+(async ()=>{
+  const s = getSettings();
+  if(s.owner && s.repo && navigator.onLine){
+    // charge seulement si local jamais modifié (pas de dirty)
+    if(!Object.keys(state.dirty||{}).length){
+      await pullFromRepo().catch(()=>{});
+    }
+  }
+})();
 </script>
 </body>
 </html>

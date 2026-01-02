@@ -1,78 +1,84 @@
-/* sw.js — update-safe (network-first for HTML, SWR for assets) */
-const VERSION = "stock-vehicule-v5";
-const CACHE_STATIC = `${VERSION}-static`;
-const CACHE_PAGES  = `${VERSION}-pages`;
+/* Stock Véhicule PWA - Service Worker (update-safe) */
+const VERSION = "stock-vehicule-v6";
+const CACHE_CORE = VERSION + "-core";
+const CACHE_RUNTIME = VERSION + "-runtime";
 
-const CORE = ["./","./index.html","./manifest.webmanifest","./icon-192.svg","./icon-512.svg","./sw.js"];
+const CORE_ASSETS = [
+  "./",
+  "./index.html",
+  "./manifest.webmanifest",
+  "./sw.js",
+  "./icon-192.svg",
+  "./icon-512.svg"
+];
 
 self.addEventListener("install", (event) => {
+  self.skipWaiting();
   event.waitUntil((async () => {
-    const cache = await caches.open(CACHE_STATIC);
-    await cache.addAll(CORE);
-    self.skipWaiting();
+    const cache = await caches.open(CACHE_CORE);
+    await cache.addAll(CORE_ASSETS.map(u => new Request(u, { cache: "reload" })));
   })());
 });
 
 self.addEventListener("activate", (event) => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
-    await Promise.all(keys.map((k) => {
-      if (k.startsWith("stock-vehicule-") && !k.startsWith(VERSION)) return caches.delete(k);
-      return null;
+    await Promise.all(keys.map(k => {
+      if (k !== CACHE_CORE && k !== CACHE_RUNTIME) return caches.delete(k);
     }));
     await self.clients.claim();
   })());
 });
 
-async function cachePut(cacheName, request, response) {
+self.addEventListener("message", (event) => {
+  if (event.data === "SKIP_WAITING") self.skipWaiting();
+});
+
+async function networkFirst(request, cacheName){
   const cache = await caches.open(cacheName);
-  await cache.put(request, response);
+  try{
+    const res = await fetch(request, { cache: "no-store" });
+    if(res && res.ok) cache.put(request, res.clone());
+    return res;
+  }catch{
+    const cached = await cache.match(request);
+    if(cached) return cached;
+    throw new Error("offline");
+  }
 }
 
-async function networkFirst(request) {
-  try {
-    const fresh = await fetch(request, { cache: "no-store" });
-    await cachePut(CACHE_PAGES, request, fresh.clone());
-    return fresh;
-  } catch {
-    const cached = await caches.match(request);
-    if (cached) return cached;
-    const fallback = await caches.match("./index.html");
-    return fallback || new Response("Offline", { status: 200, headers: { "Content-Type": "text/plain" } });
-  }
+async function staleWhileRevalidate(request, cacheName){
+  const cache = await caches.open(cacheName);
+  const cached = await cache.match(request);
+  const fetchPromise = fetch(request).then(res => {
+    if(res && res.ok) cache.put(request, res.clone());
+    return res;
+  }).catch(() => null);
+
+  return cached || fetchPromise;
 }
 
 self.addEventListener("fetch", (event) => {
   const req = event.request;
-  if (req.method !== "GET") return;
+  if(req.method !== "GET") return;
 
   const url = new URL(req.url);
-  if (url.origin !== self.location.origin) return;
 
-  // HTML navigations => network-first
-  const accept = (req.headers.get("accept") || "");
-  if (req.mode === "navigate" || accept.includes("text/html")) {
-    event.respondWith(networkFirst(req));
+  // Only handle same-origin
+  if(url.origin !== self.location.origin) return;
+
+  // Always take latest for HTML/navigation
+  if(req.mode === "navigate" || (req.headers.get("accept") || "").includes("text/html")){
+    event.respondWith(networkFirst(req, CACHE_CORE));
     return;
   }
 
-  // assets => stale-while-revalidate
-  event.respondWith((async () => {
-    const cached = await caches.match(req);
-    const fetchP = fetch(req).then(async (fresh) => {
-      if (fresh && fresh.ok) await cachePut(CACHE_STATIC, req, fresh.clone());
-      return fresh;
-    }).catch(() => null);
+  // Stock files: network-first (real-time) with cache fallback
+  if(url.pathname.includes("/stock/") && url.pathname.endsWith(".json")){
+    event.respondWith(networkFirst(req, CACHE_RUNTIME));
+    return;
+  }
 
-    if (cached) {
-      event.waitUntil(fetchP);
-      return cached;
-    }
-    const fresh = await fetchP;
-    return fresh || new Response("", { status: 504 });
-  })());
-});
-
-self.addEventListener("message", (event) => {
-  if (event.data === "SKIP_WAITING") self.skipWaiting();
+  // Default: SWR for assets (images, icons, css, etc.)
+  event.respondWith(staleWhileRevalidate(req, CACHE_RUNTIME));
 });
