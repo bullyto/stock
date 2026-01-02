@@ -176,7 +176,6 @@
     }
     .bottle.hasimg .fallback{display:none}
 
-    /* Badges multiplicateur (on les garde beaux !) */
     .badgeQty{
       position:absolute; top: 10px; right: 10px;
       padding: 8px 10px; border-radius: 999px;
@@ -195,7 +194,6 @@
     .metaRow{display:flex; align-items:center; justify-content:space-between; gap:10px; color: var(--mut); font-size: 12px; font-weight: 850;}
     .tag{padding: 7px 9px; border-radius: 999px; border:1px solid rgba(255,255,255,.10); background: rgba(255,255,255,.045); color: rgba(159,176,200,.9); font-size: 11px; font-weight: 950; white-space:nowrap;}
 
-    /* Sheet */
     .sheetBackdrop{position:fixed; inset:0; background: rgba(0,0,0,.68); backdrop-filter: blur(10px); opacity:0; pointer-events:none; transition: opacity .18s ease; z-index: 90;}
     .sheetBackdrop.show{opacity:1; pointer-events:auto;}
     .sheet{position:fixed; left:0; right:0; bottom: -430px; transition: transform .22s ease; z-index: 95; padding: 0 12px calc(env(safe-area-inset-bottom) + 12px);}
@@ -214,7 +212,6 @@
     .ctl:active{transform:translateY(1px)}
     .rowChips{margin-top:10px;display:flex;gap:10px;flex-wrap:wrap}
 
-    /* FAB (scanner) — opacité quasi totale */
     .fab{position: fixed; right: 16px; bottom: calc(env(safe-area-inset-bottom) + 16px); z-index: 80;
       width: 62px; height: 62px; border-radius: 22px;
       border: 1px solid rgba(255,255,255,.16);
@@ -232,7 +229,6 @@
     }
     .fab svg{position:relative}
 
-    /* Scanner modal */
     .modal{position:fixed; inset:0; background: rgba(0,0,0,.72); backdrop-filter: blur(10px); z-index: 110;
       opacity:0; pointer-events:none; transition: opacity .18s ease;
       display:flex; align-items:flex-end; padding: 12px; padding-bottom: calc(env(safe-area-inset-bottom) + 12px);
@@ -275,7 +271,7 @@
     .confirmRow button:active{transform:translateY(1px)}
     .confirmRow button:disabled{opacity:.55; cursor:not-allowed}
 
-    /* Settings modal */
+    /* Settings (token only) */
     .settings{position:fixed; inset:0; z-index: 130;
       background: rgba(0,0,0,.72); backdrop-filter: blur(12px);
       opacity:0; pointer-events:none; transition: opacity .18s ease;
@@ -288,8 +284,6 @@
     .settingsTop{padding: 12px 14px; display:flex; align-items:center; justify-content:space-between; gap:10px; border-bottom: 1px solid rgba(255,255,255,.10);}
     .settingsTop b{font-weight:1000; letter-spacing:.2px}
     .settingsBody{padding: 12px 14px}
-    .formGrid{display:grid; grid-template-columns: 1fr 1fr; gap: 10px;}
-    @media (max-width: 680px){ .formGrid{grid-template-columns: 1fr;} }
     .field{display:flex; flex-direction:column; gap:6px}
     .field label{font-size:12px; color: rgba(159,176,200,.86); font-weight:900}
     .field input{
@@ -305,10 +299,7 @@
     .settingsActions{margin-top:12px; display:grid; grid-template-columns: 1fr 1fr; gap:10px;}
     .settingsActions .btn{width:100%; justify-content:center}
     .settingsActions .btn.primary{justify-content:center}
-    .settingsActions3{margin-top:10px; display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px;}
-    @media (max-width: 680px){ .settingsActions3{grid-template-columns: 1fr;} }
 
-    /* Toast */
     .toast{position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom) + 92px);
       transform: translateX(-50%);
       padding: 10px 12px; border-radius: 999px; border:1px solid rgba(255,255,255,.12);
@@ -339,12 +330,12 @@
         <div class="actions">
           <div class="chip"><span class="dot off" id="dotNet"></span><span id="chipStatus">Offline</span></div>
 
-          <button class="btn" type="button" id="btnSettings" title="Paramètres (token GitHub)">
+          <button class="btn" type="button" id="btnSettings" title="Token GitHub">
             <svg class="icon" viewBox="0 0 24 24" fill="none">
               <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" stroke="currentColor" stroke-width="2"/>
               <path d="M19.4 15a7.8 7.8 0 0 0 .1-1l2-1.2-2-3.5-2.3.7a7.8 7.8 0 0 0-1.7-1L15 4h-6l-.5 2.9a7.8 7.8 0 0 0-1.7 1L4.5 7.2l-2 3.5 2 1.2a7.8 7.8 0 0 0 0 2l-2 1.2 2 3.5 2.3-.7a7.8 7.8 0 0 0 1.7 1L9 20h6l.5-2.9a7.8 7.8 0 0 0 1.7-1l2.3.7 2-3.5-2-1.2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
             </svg>
-            Paramètres
+            Token
           </button>
 
           <button class="btn primary" type="button" id="btnSaveRepo" title="Enregistrer le stock en dépôt (GitHub)">
@@ -447,54 +438,32 @@
     </div>
   </div>
 
-  <!-- Settings -->
+  <!-- Settings (Token only) -->
   <div class="settings" id="settings" aria-hidden="true">
     <div class="settingsCard">
       <div class="settingsTop">
-        <b>Paramètres dépôt (GitHub)</b>
+        <b>Token GitHub (PAT)</b>
         <div class="right">
           <button class="miniBtn primary" id="btnCloseSettings" type="button">Fermer</button>
         </div>
       </div>
 
       <div class="settingsBody">
-        <div class="formGrid">
-          <div class="field">
-            <label>Owner</label>
-            <input id="ghOwner" placeholder="ex: bullyto" autocomplete="off" />
-          </div>
-          <div class="field">
-            <label>Repo</label>
-            <input id="ghRepo" placeholder="ex: stock" autocomplete="off" />
-          </div>
-          <div class="field">
-            <label>Branch</label>
-            <input id="ghBranch" placeholder="main" autocomplete="off" />
-          </div>
-          <div class="field">
-            <label>Dossier stock</label>
-            <input id="ghPath" placeholder="stock" autocomplete="off" />
-          </div>
-          <div class="field">
-            <label>Extension fichiers</label>
-            <input id="ghExt" placeholder=".json" autocomplete="off" />
-          </div>
-          <div class="field">
-            <label>Token GitHub (PAT)</label>
-            <input id="ghToken" placeholder="ghp_..." autocomplete="off" />
-          </div>
+        <div class="field">
+          <label>Token GitHub (PAT)</label>
+          <input id="ghToken" placeholder="ghp_… / github_pat_…" autocomplete="off" />
         </div>
 
         <div class="help">
-          • Le stock est enregistré <strong>1 fichier par bouteille</strong> : <code>stock/&lt;id-bouteille&gt;.json</code> (ex: <code>stock/poliakov.json</code>).<br>
+          • Dépôt utilisé par défaut : <code>bullyto/stock</code> (branch <code>main</code>)<br>
+          • Stock = <strong>1 fichier par bouteille</strong> : <code>stock/&lt;id-bouteille&gt;.json</code> + un <code>stock/_snapshot.json</code><br>
           • Le token est stocké <strong>uniquement en local</strong> (LocalStorage).<br>
-          • Astuce : tu peux laisser le token vide pour juste <em>lire</em> (repo public), mais pour <em>écrire</em> il faut un token.
+          • Sans token : tu peux lire (repo public). Avec token : tu peux <strong>écrire</strong> (enregistrer dépôt).
         </div>
 
-        <div class="settingsActions3">
-          <button class="btn" id="btnSaveSettings" type="button">Enregistrer paramètres</button>
+        <div class="settingsActions">
           <button class="btn" id="btnPullRepo" type="button">Charger depuis dépôt</button>
-          <button class="btn primary" id="btnPushRepo" type="button">Enregistrer dépôt</button>
+          <button class="btn primary" id="btnSaveToken" type="button">Enregistrer token</button>
         </div>
       </div>
     </div>
@@ -513,27 +482,22 @@ async function registerSW(){
   if (!("serviceWorker" in navigator)) return;
   try{
     const reg = await navigator.serviceWorker.register("./sw.js");
-    // Force check update
     reg.update?.();
 
-    // If a new SW is waiting => apply immediately
-    if (reg.waiting) reg.waiting.postMessage("SKIP_WAITING");
+    if (reg.waiting) reg.waiting.postMessage({ type:"SKIP_WAITING" });
 
-    // When controller changes => reload to use new assets
     navigator.serviceWorker.addEventListener("controllerchange", () => {
-      // avoid infinite reload loop
       if (window.__reloadedOnce) return;
       window.__reloadedOnce = true;
       location.reload();
     });
 
-    // If a new SW installs later
     reg.addEventListener("updatefound", () => {
       const nw = reg.installing;
       if(!nw) return;
       nw.addEventListener("statechange", () => {
         if (nw.state === "installed" && navigator.serviceWorker.controller) {
-          reg.waiting?.postMessage("SKIP_WAITING");
+          reg.waiting?.postMessage({ type:"SKIP_WAITING" });
         }
       });
     });
@@ -551,9 +515,18 @@ window.addEventListener("load", () => { updateOnlineUI(); registerSW(); });
 
 /* ========= Data ========= */
 const LOW_THRESHOLD = 2;
-const LS_KEY = "stock_vehicle_v2";
-const SETTINGS_KEY = "stock_vehicle_settings_v1";
+const LS_KEY = "stock_vehicle_v3";
+const SETTINGS_KEY = "stock_vehicle_settings_v2";
 const IMG_DIR = "./img/";
+
+/* >>> DEFAULTS EN DUR (tu ne touches plus à rien) <<< */
+const DEFAULT_GH = {
+  owner: "bullyto",
+  repo: "stock",
+  branch: "main",
+  stockPath: "stock",
+  ext: ".json"
+};
 
 const PRODUCTS = [
   { id:"tequila_sanjose", name:"Tequila San José", barcode:"" },
@@ -606,7 +579,7 @@ const state = {
   selectedId: null,
   stock: {},
   dirty: {},     // {id:true} => modifié localement non poussé
-  settings: null,
+  token: "",     // le seul “paramètre”
   lastScan: { ean:"", matchId:null }
 };
 
@@ -617,7 +590,6 @@ function seededStock(){
 }
 
 function load(){
-  // stock local
   try{
     const raw = localStorage.getItem(LS_KEY);
     if(!raw) throw new Error("no");
@@ -631,20 +603,20 @@ function load(){
     save();
   }
 
-  // settings
   try{
     const rawS = localStorage.getItem(SETTINGS_KEY);
-    state.settings = rawS ? JSON.parse(rawS) : null;
+    const s = rawS ? JSON.parse(rawS) : null;
+    state.token = (s && s.token) ? String(s.token) : "";
   }catch{
-    state.settings = null;
+    state.token = "";
   }
 }
 function save(){
-  localStorage.setItem(LS_KEY, JSON.stringify({ v: 2, savedAt: Date.now(), stock: state.stock, dirty: state.dirty }));
+  localStorage.setItem(LS_KEY, JSON.stringify({ v: 3, savedAt: Date.now(), stock: state.stock, dirty: state.dirty }));
 }
-function saveSettings(settings){
-  localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
-  state.settings = settings;
+function saveToken(token){
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify({ v: 2, token: String(token||"") }));
+  state.token = String(token||"");
 }
 
 /* ========= UI ========= */
@@ -773,10 +745,7 @@ function adjust(delta){
   const v = Number(state.stock[id] ?? 0);
   const nv = Math.max(0, v + delta);
   state.stock[id] = nv;
-
-  // mark dirty
   state.dirty[id] = true;
-
   sheetQty.textContent = nv;
   save();
   render();
@@ -795,36 +764,30 @@ function setFilter(f){
 const btnSaveRepo = document.getElementById("btnSaveRepo");
 const btnSettings = document.getElementById("btnSettings");
 
-function defaultSettings(){
-  return { owner:"", repo:"", branch:"main", stockPath:"stock", ext:".json", token:"" };
-}
-function getSettings(){
-  const s = state.settings || defaultSettings();
+function getGH(){
   return {
-    owner: (s.owner||"").trim(),
-    repo: (s.repo||"").trim(),
-    branch: (s.branch||"main").trim() || "main",
-    stockPath: (s.stockPath||"stock").trim().replace(/^\/+|\/+$/g,"") || "stock",
-    ext: (s.ext||".json").trim() || ".json",
-    token: (s.token||"").trim()
+    owner: DEFAULT_GH.owner,
+    repo: DEFAULT_GH.repo,
+    branch: DEFAULT_GH.branch,
+    stockPath: DEFAULT_GH.stockPath,
+    ext: DEFAULT_GH.ext,
+    token: String(state.token||"").trim()
   };
 }
 
 function updateSaveButtonsState(){
-  const s = getSettings();
-  const hasRepo = !!(s.owner && s.repo && s.branch && s.stockPath);
+  const s = getGH();
   const hasToken = !!s.token;
   const dirtyCount = Object.keys(state.dirty).length;
-  btnSaveRepo.disabled = !(hasRepo && hasToken && dirtyCount);
+  btnSaveRepo.disabled = !(hasToken && dirtyCount);
 }
 
 function b64encodeUnicode(str){
-  // safe base64 for UTF-8
   return btoa(unescape(encodeURIComponent(str)));
 }
 
 async function ghApi(path, options={}){
-  const s = getSettings();
+  const s = getGH();
   const headers = options.headers || {};
   headers["Accept"] = "application/vnd.github+json";
   if(s.token) headers["Authorization"] = "token " + s.token;
@@ -842,16 +805,8 @@ async function ghGetSha(owner, repo, filePath, branch){
 }
 
 async function ghPutFile(owner, repo, filePath, branch, message, contentStr){
-  const sha = await ghGetSha(owner, repo, filePath, branch).catch(e => { 
-    // if token missing/private might error; bubble
-    throw e;
-  });
-
-  const body = {
-    message,
-    content: b64encodeUnicode(contentStr),
-    branch
-  };
+  const sha = await ghGetSha(owner, repo, filePath, branch);
+  const body = { message, content: b64encodeUnicode(contentStr), branch };
   if(sha) body.sha = sha;
 
   const res = await ghApi(`/repos/${owner}/${repo}/contents/${encodeURIComponent(filePath).replace(/%2F/g,"/")}`, {
@@ -861,26 +816,25 @@ async function ghPutFile(owner, repo, filePath, branch, message, contentStr){
   });
   if(!res.ok){
     const t = await res.text().catch(()=> "");
-    throw new Error("PUT failed: " + res.status + " " + t.slice(0,120));
+    throw new Error("PUT failed: " + res.status + " " + t.slice(0,160));
   }
   return true;
 }
 
 function fileForId(id){
-  const s = getSettings();
+  const s = getGH();
   const ext = s.ext.startsWith(".") ? s.ext : ("." + s.ext);
   return `${s.stockPath}/${id}${ext}`;
 }
-
 function snapshotPath(){
-  const s = getSettings();
+  const s = getGH();
   return `${s.stockPath}/_snapshot.json`;
 }
 
 async function pushToRepo(){
-  const s = getSettings();
-  if(!(s.owner && s.repo && s.token)){
-    toastMsg("Paramètres dépôt incomplets");
+  const s = getGH();
+  if(!s.token){
+    toastMsg("Ajoute ton token pour écrire");
     openSettings();
     return;
   }
@@ -896,15 +850,12 @@ async function pushToRepo(){
   const now = new Date().toISOString();
   const msgBase = `stock: update ${now}`;
 
-  // pousse en série (plus sûr sur mobile)
   for(const id of dirtyIds){
     const qty = Number(state.stock[id] ?? 0);
     const payload = { id, qty, updatedAt: now };
-    const filePath = fileForId(id);
-    await ghPutFile(s.owner, s.repo, filePath, s.branch, msgBase + ` (${id})`, JSON.stringify(payload, null, 2));
+    await ghPutFile(s.owner, s.repo, fileForId(id), s.branch, msgBase + ` (${id})`, JSON.stringify(payload, null, 2));
   }
 
-  // snapshot global (pratique pour charger en 1 requête)
   const snapshot = {
     v: 1,
     updatedAt: now,
@@ -912,7 +863,6 @@ async function pushToRepo(){
   };
   await ghPutFile(s.owner, s.repo, snapshotPath(), s.branch, msgBase + " (_snapshot)", JSON.stringify(snapshot, null, 2));
 
-  // clear dirty
   state.dirty = {};
   save();
   render();
@@ -920,19 +870,12 @@ async function pushToRepo(){
 }
 
 async function pullFromRepo(){
-  const s = getSettings();
-  if(!(s.owner && s.repo)){
-    toastMsg("Renseigne owner/repo");
-    openSettings();
-    return;
-  }
-
+  const s = getGH();
   toastMsg("Chargement dépôt…");
 
-  // Try snapshot first (API si token, sinon raw)
   const snapFile = snapshotPath();
-
   let snap = null;
+
   try{
     if(s.token){
       const res = await ghApi(`/repos/${s.owner}/${s.repo}/contents/${encodeURIComponent(snapFile).replace(/%2F/g,"/")}?ref=${encodeURIComponent(s.branch)}`);
@@ -954,7 +897,6 @@ async function pullFromRepo(){
       const v = Number(it.qty);
       if(Number.isFinite(v) && v >= 0) state.stock[it.id] = Math.floor(v);
     }
-    // Pull écrase en local (donc on clear dirty)
     state.dirty = {};
     save();
     render();
@@ -962,53 +904,18 @@ async function pullFromRepo(){
     return;
   }
 
-  // Fallback: 1 fichier par bouteille (31 req)
-  if(!s.token){
-    toastMsg("Snapshot absent. Mets un token pour charger fichier par fichier.");
-    return;
-  }
-
-  for(const p of PRODUCTS){
-    const filePath = fileForId(p.id);
-    try{
-      const res = await ghApi(`/repos/${s.owner}/${s.repo}/contents/${encodeURIComponent(filePath).replace(/%2F/g,"/")}?ref=${encodeURIComponent(s.branch)}`);
-      if(!res.ok) continue;
-      const data = await res.json();
-      const content = data.content ? atob(data.content.replace(/\n/g,"")) : "";
-      const obj = JSON.parse(content);
-      const v = Number(obj.qty);
-      if(Number.isFinite(v) && v >= 0) state.stock[p.id] = Math.floor(v);
-    }catch{}
-  }
-
-  state.dirty = {};
-  save();
-  render();
-  toastMsg("Stock chargé ✅");
+  toastMsg("Snapshot absent : charge impossible");
 }
 
-/* ========= Settings modal ========= */
+/* ========= Settings modal (token only) ========= */
 const settingsEl = document.getElementById("settings");
 const btnCloseSettings = document.getElementById("btnCloseSettings");
-const btnSaveSettings = document.getElementById("btnSaveSettings");
+const btnSaveToken = document.getElementById("btnSaveToken");
 const btnPullRepo = document.getElementById("btnPullRepo");
-const btnPushRepo = document.getElementById("btnPushRepo");
-
-const ghOwner = document.getElementById("ghOwner");
-const ghRepo = document.getElementById("ghRepo");
-const ghBranch = document.getElementById("ghBranch");
-const ghPath = document.getElementById("ghPath");
-const ghExt = document.getElementById("ghExt");
 const ghToken = document.getElementById("ghToken");
 
 function openSettings(){
-  const s = getSettings();
-  ghOwner.value = s.owner;
-  ghRepo.value = s.repo;
-  ghBranch.value = s.branch || "main";
-  ghPath.value = s.stockPath || "stock";
-  ghExt.value = s.ext || ".json";
-  ghToken.value = s.token || "";
+  ghToken.value = String(state.token||"");
   settingsEl.classList.add("show");
   settingsEl.setAttribute("aria-hidden","false");
 }
@@ -1021,27 +928,16 @@ btnSettings.addEventListener("click", openSettings);
 btnCloseSettings.addEventListener("click", closeSettings);
 settingsEl.addEventListener("click", (e)=>{ if(e.target === settingsEl) closeSettings(); });
 
-btnSaveSettings.addEventListener("click", ()=>{
-  const s = {
-    owner: (ghOwner.value||"").trim(),
-    repo: (ghRepo.value||"").trim(),
-    branch: (ghBranch.value||"main").trim() || "main",
-    stockPath: (ghPath.value||"stock").trim(),
-    ext: (ghExt.value||".json").trim() || ".json",
-    token: (ghToken.value||"").trim()
-  };
-  saveSettings(s);
+btnSaveToken.addEventListener("click", ()=>{
+  const t = (ghToken.value||"").trim();
+  saveToken(t);
   render();
-  toastMsg("Paramètres OK ✅");
+  toastMsg(t ? "Token enregistré ✅" : "Token supprimé ✅");
   closeSettings();
 });
 
 btnPullRepo.addEventListener("click", async ()=>{
   await pullFromRepo();
-});
-btnPushRepo.addEventListener("click", async ()=>{
-  await pushToRepo();
-  closeSettings();
 });
 
 btnSaveRepo.addEventListener("click", pushToRepo);
@@ -1207,14 +1103,10 @@ btnConfirmDeduct.addEventListener("click", ()=>{
 load();
 render();
 
-// Optionnel : auto-charger depuis dépôt au démarrage (si token + repo configurés)
+// Auto-charger depuis dépôt au démarrage (si online et pas de modifs locales)
 (async ()=>{
-  const s = getSettings();
-  if(s.owner && s.repo && navigator.onLine){
-    // charge seulement si local jamais modifié (pas de dirty)
-    if(!Object.keys(state.dirty||{}).length){
-      await pullFromRepo().catch(()=>{});
-    }
+  if(navigator.onLine && !Object.keys(state.dirty||{}).length){
+    await pullFromRepo().catch(()=>{});
   }
 })();
 </script>
