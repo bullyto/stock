@@ -1,14 +1,14 @@
 {
   "v": 1,
-  "updatedAt": "2026-01-03T14:52:08.049Z",
+  "updatedAt": "2026-01-03T18:09:40.510Z",
   "items": [
     {
       "id": "poliakov",
-      "qty": 0
+      "qty": 3
     },
     {
       "id": "absolut",
-      "qty": 0
+      "qty": 3
     },
     {
       "id": "ciroc_pomme",
@@ -24,23 +24,23 @@
     },
     {
       "id": "william_peel",
-      "qty": 0
+      "qty": 3
     },
     {
       "id": "label_5",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "ballantines",
-      "qty": 0
+      "qty": 2
     },
     {
       "id": "jack_old7",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "jack_honey",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "old_nick_darkwood",
@@ -48,11 +48,11 @@
     },
     {
       "id": "captain_morgan",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "havana_especial",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "old_nick_blanc",
@@ -68,19 +68,19 @@
     },
     {
       "id": "havana_3ans",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "gibsons_gin",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "gordons_gin",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "ricard",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "pastis_51",
@@ -88,31 +88,31 @@
     },
     {
       "id": "get_27",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "jagermeister",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "tequila_sanjose",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "vin_rose",
-      "qty": 0
+      "qty": 2
     },
     {
       "id": "vin_blanc",
-      "qty": 0
+      "qty": 2
     },
     {
       "id": "vin_rouge",
-      "qty": 0
+      "qty": 2
     },
     {
       "id": "muscat",
-      "qty": 0
+      "qty": 2
     }
   ]
 }
