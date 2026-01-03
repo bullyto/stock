@@ -559,9 +559,9 @@ const PRODUCTS = [
   { id:"jagermeister", name:"Jägermeister", barcode:"", price:35 },
   { id:"tequila_sanjose", name:"Tequila San José", barcode:"", price:28 },
 
-  { id:"vin_rose", name:"Vin rosé", barcode:"", price:19 },
-  { id:"vin_blanc", name:"Vin blanc", barcode:"", price:19 },
-  { id:"vin_rouge", name:"Vin rouge", barcode:"", price:19 },
+  { id:"xv_catalan_rose", name:"XV Catalan rose", barcode:"", price:19 },
+  { id:"xv_catalan_blanc", name:"XV Catalan blanc", barcode:"", price:19 },
+  { id:"xv_catalan_rouge", name:"XV Catalan rouge", barcode:"", price:19 },
   { id:"muscat", name:"Muscat", barcode:"", price:25 }
 ];
 
@@ -591,9 +591,9 @@ const SEED_STOCK = {
   ciroc_redberry:0,
   william_peel:3,
   label_5:3,
-  vin_rouge:3,
-  vin_blanc:3,
-  vin_rose:3,
+  xv_catalan_rouge:3,
+  xv_catalan_blanc:3,
+  xv_catalan_rose:3,
   muscat:1,
 };
 
@@ -606,6 +606,13 @@ const state = {
   token: "",     // le seul “paramètre”
   lastScan: { ean:"", matchId:null }
 };
+
+const ID_ALIASES = {
+  vin_rose: "xv_catalan_rose",
+  vin_blanc: "xv_catalan_blanc",
+  vin_rouge: "xv_catalan_rouge"
+};
+
 
 function seededStock(){
   const s = {};
@@ -621,6 +628,21 @@ function load(){
     if(!data || typeof data.stock !== "object") throw new Error("bad");
     state.stock = data.stock || {};
     state.dirty = data.dirty || {};
+
+    // Migration IDs (anciens vins -> nouveaux IDs XV Catalan)
+    for(const [oldId,newId] of Object.entries(ID_ALIASES)){
+      if(state.stock[oldId] != null && state.stock[newId] == null){
+        state.stock[newId] = Number(state.stock[oldId] ?? 0);
+      }
+      // nettoie l'ancien id pour éviter double comptage
+      if(state.stock[oldId] != null){
+        delete state.stock[oldId];
+      }
+      if(state.dirty && state.dirty[oldId]){
+        state.dirty[newId] = true;
+        delete state.dirty[oldId];
+      }
+    }
   }catch{
     state.stock = seededStock();
     state.dirty = {};
@@ -941,8 +963,9 @@ async function pullFromRepo(){
   if(snap && Array.isArray(snap.items)){
     for(const it of snap.items){
       if(!it || !it.id) continue;
+      const id = ID_ALIASES[it.id] || it.id;
       const v = Number(it.qty);
-      if(Number.isFinite(v) && v >= 0) state.stock[it.id] = Math.floor(v);
+      if(Number.isFinite(v) && v >= 0) state.stock[id] = Math.floor(v);
     }
     state.dirty = {};
     save();
