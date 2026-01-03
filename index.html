@@ -803,8 +803,8 @@ function getGH(){
 function updateSaveButtonsState(){
   const s = getGH();
   const hasToken = !!s.token;
-  const dirtyCount = Object.keys(state.dirty).length;
-  btnSaveRepo.disabled = !(hasToken && dirtyCount);
+  // Mode forcé : on autorise l'enregistrement même s'il n'y a aucune modif locale (dirty=0)
+  btnSaveRepo.disabled = !hasToken;
 }
 
 function b64encodeUnicode(str){
@@ -815,7 +815,7 @@ async function ghApi(path, options={}){
   const s = getGH();
   const headers = options.headers || {};
   headers["Accept"] = "application/vnd.github+json";
-  if(s.token) headers["Authorization"] = "token " + s.token;
+  if(s.token) headers["Authorization"] = "Bearer " + s.token; // PAT classique & fine-grained
   if(options.json) headers["Content-Type"] = "application/json";
   const res = await fetch("https://api.github.com" + path, { ...options, headers });
   return res;
@@ -863,35 +863,57 @@ async function pushToRepo(){
     openSettings();
     return;
   }
-  const dirtyIds = Object.keys(state.dirty);
-  if(!dirtyIds.length){
-    toastMsg("Rien à enregistrer");
-    return;
-  }
+
+  // Mode forcé :
+  // - s'il y a des modifs locales (dirty), on pousse uniquement ces fichiers
+  // - sinon, on réécrit AU MINIMUM le _snapshot.json (commit garanti) + (option) tous les fichiers
+  const dirtyIds = Object.keys(state.dirty || {});
+  const forceAllFiles = false; // mets true si tu veux réécrire *tous* les stock/<id>.json à chaque sauvegarde
+  const idsToPush = dirtyIds.length ? dirtyIds : (forceAllFiles ? PRODUCTS.map(p=>p.id) : []);
 
   btnSaveRepo.disabled = true;
-  toastMsg("Enregistrement…");
+  toastMsg(dirtyIds.length ? "Enregistrement…" : "Enregistrement (forcé)…");
 
   const now = new Date().toISOString();
   const msgBase = `stock: update ${now}`;
 
-  for(const id of dirtyIds){
-    const qty = Number(state.stock[id] ?? 0);
-    const payload = { id, qty, updatedAt: now };
-    await ghPutFile(s.owner, s.repo, fileForId(id), s.branch, msgBase + ` (${id})`, JSON.stringify(payload, null, 2));
+  try{
+    // 1) Fichiers par produit (si nécessaire)
+    for(const id of idsToPush){
+      const qty = Number(state.stock[id] ?? 0);
+      const payload = { id, qty, updatedAt: now };
+      await ghPutFile(
+        s.owner, s.repo, fileForId(id), s.branch,
+        msgBase + ` (${id})`,
+        JSON.stringify(payload, null, 2)
+      );
+    }
+
+    // 2) Snapshot : TOUJOURS réécrit (c'est lui qui sert au "Charger depuis dépôt")
+    const snapshot = {
+      v: 1,
+      updatedAt: now,
+      items: PRODUCTS.map(p => ({ id: p.id, qty: Number(state.stock[p.id] ?? 0) }))
+    };
+    await ghPutFile(
+      s.owner, s.repo, snapshotPath(), s.branch,
+      msgBase + " (_snapshot)",
+      JSON.stringify(snapshot, null, 2)
+    );
+
+    // OK : on peut vider dirty
+    state.dirty = {};
+    save();
+    render();
+    toastMsg("Dépôt mis à jour ✅");
+  }catch(err){
+    console.error(err);
+    // IMPORTANT : on ne vide PAS dirty en cas d'erreur
+    toastMsg("Erreur GitHub ❌ (vérifie droits du token)");
+  }finally{
+    // On réactive le bouton selon l'état (token)
+    updateSaveButtonsState();
   }
-
-  const snapshot = {
-    v: 1,
-    updatedAt: now,
-    items: PRODUCTS.map(p => ({ id: p.id, qty: Number(state.stock[p.id] ?? 0) }))
-  };
-  await ghPutFile(s.owner, s.repo, snapshotPath(), s.branch, msgBase + " (_snapshot)", JSON.stringify(snapshot, null, 2));
-
-  state.dirty = {};
-  save();
-  render();
-  toastMsg("Dépôt mis à jour ✅");
 }
 
 async function pullFromRepo(){
